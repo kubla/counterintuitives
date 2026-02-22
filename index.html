@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amortize & Arbitrage</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header>
+        <h1>Amortize &amp; Arbitrage</h1>
+        <p class="subtitle">15-year vs 30-year mortgage break-even return calculator</p>
+        <p>
+          This tool compares two strategies for people who can afford a 15-year mortgage payment.
+          Either you take the 15-year loan and invest later, or you take the 30-year loan and invest
+          the monthly payment difference immediately. The calculator tells you the break-even investment
+          return where the 30-year strategy starts to win.
+        </p>
+      </header>
+
+      <section class="panel">
+        <h2>Inputs</h2>
+        <div class="inputs-grid">
+          <div>
+            <label for="loan">Mortgage amount (USD)</label>
+            <input id="loan" name="L" type="number" min="1" max="100000000" step="1" value="1000000" />
+          </div>
+          <div>
+            <label for="apr15">15-year APR (%)</label>
+            <input id="apr15" name="r15" type="number" step="0.01" value="5.35" />
+          </div>
+          <div>
+            <label for="apr30">30-year APR (%)</label>
+            <input id="apr30" name="r30" type="number" step="0.01" value="6.01" />
+          </div>
+          <div>
+            <label for="rtest">Test investment return (annual effective, %)</label>
+            <input id="rtest" name="R" type="number" min="-99.99" step="0.01" placeholder="Optional" />
+          </div>
+        </div>
+        <button id="copyLink" type="button">Copy share link</button>
+      </section>
+
+      <section class="panel">
+        <h2>How to use</h2>
+        <ol>
+          <li>Enter your loan amount and the 15-year and 30-year rates.</li>
+          <li>Optionally enter a return you expect from your alternative investment.</li>
+          <li>Read the break-even return, then compare the side-by-side scenario summaries.</li>
+        </ol>
+      </section>
+
+      <section class="panel" aria-live="polite">
+        <h2>Monthly payment comparison</h2>
+        <dl class="metrics">
+          <div><dt>15-year monthly payment</dt><dd id="p15"></dd></div>
+          <div><dt>30-year monthly payment</dt><dd id="p30"></dd></div>
+          <div><dt>Monthly difference to invest (D)</dt><dd id="d"></dd></div>
+        </dl>
+        <p id="error" class="error" hidden></p>
+      </section>
+
+      <section class="panel" id="breakEvenPanel" aria-live="polite">
+        <h2>Break-even return</h2>
+        <dl class="metrics">
+          <div><dt>Break-even annual return (R*)</dt><dd id="rstar"></dd></div>
+          <div><dt>Break-even monthly return (i*)</dt><dd id="istar"></dd></div>
+        </dl>
+        <p>
+          At <span id="rstarInline"></span>, Scenario A and Scenario B end with the same investment
+          account value after 30 years. Above R*, investing earlier (Scenario B) wins. Below R*, paying
+          down the mortgage faster (Scenario A) wins.
+        </p>
+      </section>
+
+      <section class="panel" id="scenarioPanel" aria-live="polite">
+        <h2>Scenario summaries</h2>
+        <p id="returnCaption"></p>
+        <p id="winnerLine"></p>
+        <div class="cards">
+          <article class="card">
+            <h3>Scenario A: 15-year mortgage, then invest</h3>
+            <dl class="metrics" id="scenarioA"></dl>
+          </article>
+          <article class="card">
+            <h3>Scenario B: 30-year mortgage, invest the difference</h3>
+            <dl class="metrics" id="scenarioB"></dl>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>What this means</h2>
+        <p>
+          Both scenarios assume you deploy the same total dollars over 30 years, equal to the 15-year
+          monthly payment times 360 months. The only difference is timing: Scenario A reduces mortgage
+          interest by paying down principal faster; Scenario B invests sooner but pays more mortgage interest.
+        </p>
+      </section>
+    </main>
+
+    <footer>
+      This is a simplified model. It ignores taxes, fees, refinancing, volatility, sequence risk, home
+      appreciation, and any behavioral risk of failing to invest the difference. Use it as a sanity check,
+      not as personalized financial advice.
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
