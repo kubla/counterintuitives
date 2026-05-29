@@ -386,6 +386,9 @@
             .matrix th {
                 background: rgba(255, 255, 255, 0.08);
                 color: var(--text);
+            }
+
+            .matrix thead th {
                 position: sticky;
                 top: 66px;
                 z-index: 3;
@@ -1392,7 +1395,7 @@
                     </p>
                 </div>
 
-                <table class="matrix">
+                <table class="matrix sticky-head">
                     <thead>
                         <tr>
                             <th>Vendor</th>
@@ -1400,7 +1403,6 @@
                             <th>B · Dev builders</th>
                             <th>C · Enterprise</th>
                             <th>Likely revenue driver</th>
-                            <br />
                         </tr>
                     </thead>
                     <tbody>

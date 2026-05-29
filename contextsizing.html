@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fulcra Context Gathering: Sizing the Personal Context Layer</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --bg2: #111832;
+      --panel: rgba(255,255,255,0.075);
+      --panel2: rgba(255,255,255,0.105);
+      --line: rgba(255,255,255,0.17);
+      --text: #eef3ff;
+      --muted: #b8c2d8;
+      --soft: #7d89a7;
+      --hot: #ffcc66;
+      --warm: #ff8f70;
+      --cool: #77d5ff;
+      --green: #96e6b3;
+      --purple: #caa6ff;
+      --shadow: 0 24px 80px rgba(0,0,0,0.38);
+      --radius: 22px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(119,213,255,0.25), transparent 32rem),
+        radial-gradient(circle at 88% 12%, rgba(202,166,255,0.22), transparent 31rem),
+        radial-gradient(circle at 50% 100%, rgba(150,230,179,0.10), transparent 36rem),
+        linear-gradient(135deg, #080b17 0%, #0d1428 45%, #111527 100%);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; }
+    .shell { max-width: 1220px; margin: 0 auto; padding: 28px; }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: rgba(8,11,23,0.74);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .nav-inner {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 12px 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: space-between;
+    }
+    .brand { display: flex; gap: 10px; align-items: center; font-weight: 760; letter-spacing: -0.02em; }
+    .brand-mark {
+      width: 34px; height: 34px; border-radius: 12px;
+      background: conic-gradient(from 180deg, var(--cool), var(--purple), var(--green), var(--hot), var(--cool));
+      box-shadow: 0 0 36px rgba(119,213,255,0.32);
+    }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+    .nav-links a, .chip, button.chip {
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 999px;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 8px 11px;
+      font-size: 13px;
+      background: rgba(255,255,255,0.045);
+      cursor: pointer;
+      transition: 160ms ease;
+    }
+    .nav-links a:hover, .chip:hover, button.chip.active {
+      background: rgba(255,255,255,0.13);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    .hero {
+      padding: 76px 0 40px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+      gap: 28px;
+      align-items: center;
+    }
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--cool);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 12px;
+      margin-bottom: 18px;
+    }
+    .eyebrow::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--cool); box-shadow: 0 0 18px var(--cool); }
+    h1 {
+      font-size: clamp(42px, 6.6vw, 84px);
+      line-height: 0.95;
+      letter-spacing: -0.075em;
+      margin: 0 0 22px;
+      max-width: 920px;
+    }
+    .hero p.lede {
+      color: var(--muted);
+      font-size: clamp(18px, 2vw, 23px);
+      line-height: 1.42;
+      margin: 0;
+      max-width: 760px;
+    }
+    .callout {
+      border: 1px solid rgba(255,255,255,0.16);
+      background: linear-gradient(180deg, rgba(255,255,255,0.13), rgba(255,255,255,0.06));
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .callout::after {
+      content: "";
+      position: absolute;
+      inset: auto -15% -45% auto;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,204,102,0.22), transparent 68%);
+    }
+    .quote {
+      font-size: 26px;
+      line-height: 1.1;
+      letter-spacing: -0.045em;
+      font-weight: 790;
+      margin: 0 0 18px;
+    }
+    .subtle { color: var(--muted); line-height: 1.55; }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 24px;
+    }
+    .kpi {
+      border: 1px solid rgba(255,255,255,0.13);
+      background: rgba(255,255,255,0.06);
+      border-radius: 18px;
+      padding: 18px;
+    }
+    .kpi strong { display:block; font-size: clamp(28px, 4vw, 44px); letter-spacing: -0.06em; line-height: 0.95; margin-bottom: 8px; }
+    .kpi span { color: var(--muted); font-size: 13px; line-height: 1.4; display:block; }
+
+    section { padding: 46px 0; }
+    .section-head { display: flex; justify-content: space-between; gap: 20px; align-items: end; margin-bottom: 20px; }
+    h2 { font-size: clamp(28px, 4vw, 48px); letter-spacing: -0.055em; line-height: 1; margin: 0; }
+    .section-head p { color: var(--muted); margin: 0; max-width: 520px; line-height: 1.5; }
+
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .card {
+      border: 1px solid rgba(255,255,255,0.13);
+      background: linear-gradient(180deg, rgba(255,255,255,0.095), rgba(255,255,255,0.045));
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.22);
+    }
+    .card h3 { margin: 0 0 10px; font-size: 21px; letter-spacing: -0.03em; }
+    .card p { color: var(--muted); line-height: 1.55; margin: 0; }
+    .card .tag { display:inline-flex; margin-bottom: 14px; color: #06101d; background: var(--hot); border-radius: 999px; padding: 5px 9px; font-weight: 780; font-size: 12px; }
+
+    .layers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .layer { position: relative; min-height: 240px; }
+    .layer .num { color: var(--soft); font-family: var(--mono); font-size: 12px; margin-bottom: 44px; display: block; }
+    .layer.big { background: linear-gradient(180deg, rgba(255,143,112,0.18), rgba(255,255,255,0.045)); }
+    .layer.mid { background: linear-gradient(180deg, rgba(119,213,255,0.16), rgba(255,255,255,0.045)); }
+    .layer.small { background: linear-gradient(180deg, rgba(150,230,179,0.16), rgba(255,255,255,0.045)); }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.045);
+    }
+    table { width: 100%; border-collapse: collapse; min-width: 820px; }
+    th, td { text-align: left; padding: 15px 16px; border-bottom: 1px solid rgba(255,255,255,0.10); vertical-align: top; }
+    th { color: white; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; background: rgba(255,255,255,0.08); position: sticky; top: 0; }
+    td { color: var(--muted); line-height: 1.42; }
+    td strong { color: var(--text); }
+    tr:hover td { background: rgba(255,255,255,0.035); }
+
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+    .data-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .data-card { min-height: 230px; position: relative; overflow: hidden; }
+    .data-card.hide { display: none; }
+    .data-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--cool), var(--purple), var(--hot));
+      opacity: 0.8;
+    }
+    .data-card .domain { color: var(--soft); font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .data-card h3 { margin-top: 6px; }
+    .sizes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0; }
+    .size { border: 1px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.045); border-radius: 14px; padding: 10px; }
+    .size b { display: block; color: white; font-size: 16px; letter-spacing: -0.03em; }
+    .size span { color: var(--soft); font-size: 12px; }
+
+    .meter { height: 9px; border-radius: 999px; background: rgba(255,255,255,0.10); overflow: hidden; margin-top: 12px; }
+    .meter > i { display:block; height: 100%; width: var(--w); background: linear-gradient(90deg, var(--green), var(--cool), var(--hot)); border-radius: inherit; }
+
+    .scenario {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+    .scenario .card { min-height: 260px; }
+    .scenario .range { font-size: 36px; letter-spacing: -0.06em; font-weight: 820; line-height: 1; margin: 18px 0 10px; }
+    .scenario ul, .product ul { margin: 14px 0 0 20px; padding: 0; color: var(--muted); line-height: 1.52; }
+    .scenario li, .product li { margin: 6px 0; }
+
+    .glasses {
+      display: grid;
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+    .calc label { display:block; color: var(--muted); font-size: 14px; margin-bottom: 8px; }
+    input[type="range"] { width: 100%; accent-color: #77d5ff; }
+    .calc-output { margin-top: 22px; font-size: 46px; letter-spacing: -0.07em; font-weight: 830; line-height: 1; }
+    .calc-output small { display:block; font-size: 13px; color: var(--muted); letter-spacing: normal; font-weight: 500; margin-top: 8px; }
+    .bar-list { display:grid; gap: 10px; }
+    .bar-row { display:grid; grid-template-columns: 110px 1fr 100px; gap: 10px; align-items: center; color: var(--muted); font-size: 13px; }
+    .bar { height: 12px; background: rgba(255,255,255,0.10); border-radius: 999px; overflow:hidden; }
+    .bar i { display:block; height:100%; width: var(--w); border-radius: 999px; background: linear-gradient(90deg, var(--cool), var(--purple)); }
+
+    .architecture { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    .arch-step {
+      min-height: 190px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.055);
+      padding: 16px;
+    }
+    .arch-step b { display:block; font-size: 15px; margin-bottom: 8px; }
+    .arch-step span { color: var(--muted); font-size: 13px; line-height: 1.42; display:block; }
+
+    .endpoint {
+      font-family: var(--mono);
+      border: 1px solid rgba(255,255,255,0.13);
+      background: rgba(3,6,14,0.42);
+      border-radius: 16px;
+      padding: 14px 16px;
+      color: #d7ecff;
+      overflow:auto;
+      white-space: nowrap;
+    }
+    .endpoints { display:grid; gap:10px; }
+
+    .footnotes {
+      color: var(--soft);
+      font-size: 13px;
+      line-height: 1.5;
+      border-top: 1px solid rgba(255,255,255,0.10);
+      padding-top: 18px;
+    }
+
+    .print-button { position: fixed; right: 22px; bottom: 22px; z-index: 30; box-shadow: var(--shadow); }
+
+    @media (max-width: 1000px) {
+      .hero, .glasses { grid-template-columns: 1fr; }
+      .grid-3, .layers, .data-grid, .scenario { grid-template-columns: 1fr 1fr; }
+      .architecture { grid-template-columns: repeat(3, 1fr); }
+      .nav-links { display:none; }
+    }
+    @media (max-width: 680px) {
+      .shell { padding: 18px; }
+      .nav-inner { padding: 10px 18px; }
+      .grid-3, .grid-2, .layers, .data-grid, .scenario { grid-template-columns: 1fr; }
+      .kpis { grid-template-columns: 1fr; }
+      .architecture { grid-template-columns: 1fr; }
+      .section-head { display:block; }
+      .section-head p { margin-top: 12px; }
+      h1 { font-size: 48px; }
+    }
+
+    @media print {
+      body { background: white; color: #111827; }
+      .nav, .print-button, .controls, .calc { display:none; }
+      .card, .callout, .table-wrap, .arch-step { background: white; border-color: #d0d7e2; box-shadow:none; color:#111827; }
+      .subtle, .card p, td, .scenario ul, .product ul, .footnotes { color:#374151; }
+      .shell { max-width: none; }
+      section { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="brand"><span class="brand-mark"></span><span>Fulcra Context Sizing</span></div>
+      <div class="nav-links">
+        <a href="#framing">Framing</a>
+        <a href="#model">Model</a>
+        <a href="#map">Data map</a>
+        <a href="#scenarios">Scenarios</a>
+        <a href="#future">Future</a>
+        <a href="#architecture">Architecture</a>
+      </div>
+    </div>
+  </nav>
+
+  <button class="chip print-button" onclick="window.print()">Print / PDF</button>
+
+  <main class="shell">
+    <header class="hero" id="framing">
+      <div>
+        <div class="eyebrow">Market thesis</div>
+        <h1>Agent memory is a cache. Personal context is the database of record.</h1>
+        <p class="lede">Memory providers assume continuity belongs to an agent. Fulcra’s view is more durable: continuity belongs to the person, the household, the body, the possessions, the environment, and the life timeline. Agents come and go. The personal context layer persists.</p>
+        <div class="kpis">
+          <div class="kpi"><strong>25–300 GB</strong><span>Raw context per year for an average present-day user.</span></div>
+          <div class="kpi"><strong>1–30 TB</strong><span>Raw context per year for a present-day power user.</span></div>
+          <div class="kpi"><strong>50–500+ TB</strong><span>Possible annual context exhaust for future high-bandwidth users.</span></div>
+        </div>
+      </div>
+      <aside class="callout">
+        <p class="quote">The right product is not a memory store. It is a knowledge store for all the personal data that will never be written to the Internet.</p>
+        <p class="subtle">The process is <strong>context gathering</strong>: always-on ingest plus deterministic ETL that produces organized time series, entities, documents, preferences, and provenance. Agents should call the Life API; they should not burn time and tokens rebuilding the ETL pipeline.</p>
+      </aside>
+    </header>
+
+    <section id="model">
+      <div class="section-head">
+        <h2>The three-layer sizing model</h2>
+        <p>Storage explodes when Fulcra preserves raw artifacts. The agent-facing layer stays comparatively small if data is normalized and indexed correctly.</p>
+      </div>
+      <div class="layers">
+        <div class="card layer big">
+          <span class="num">01 / RAW ARCHIVE</span>
+          <h3>Originals and high-fidelity exhaust</h3>
+          <p>PDFs, scans, photos, videos, device exports, camera/audio, vehicle logs, home-camera clips, medical imaging.</p>
+          <div class="meter"><i style="--w: 100%"></i></div>
+        </div>
+        <div class="card layer mid">
+          <span class="num">02 / NORMALIZED CONTEXT</span>
+          <h3>Canonical, queryable life data</h3>
+          <p>Time series, events, entities, transactions, preferences, OCR, embeddings, summaries, graph edges, provenance.</p>
+          <div class="meter"><i style="--w: 46%"></i></div>
+        </div>
+        <div class="card layer small">
+          <span class="num">03 / LIFE API</span>
+          <h3>Agent-usable endpoints</h3>
+          <p>Cheap, permissioned calls that answer what changed, where the user was, what they prefer, and what matters now.</p>
+          <div class="meter"><i style="--w: 18%"></i></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>Top-line estimate</h2>
+        <p>Use these as order-of-magnitude planning ranges. The difference between average and power users is driven mostly by video, imaging, car telemetry, and retention policy.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>User type</th><th>Normalized / agent-ready context</th><th>Raw archive, present-day</th><th>Raw archive, high-bandwidth future</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Average user</strong></td><td>0.5–5 GB/year</td><td>25–300 GB/year</td><td>2–20 TB/year</td></tr>
+            <tr><td><strong>Power user</strong></td><td>10–100+ GB/year</td><td>1–30 TB/year</td><td>50–500+ TB/year</td></tr>
+            <tr><td><strong>Extreme quantified-self / creator / many-camera home</strong></td><td>100 GB–1 TB/year</td><td>30–200+ TB/year</td><td>PB-scale/year</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="map">
+      <div class="section-head">
+        <h2>Annual storage map</h2>
+        <p>Filter by domain. Each card separates raw retained data from normalized, agent-ready context.</p>
+      </div>
+      <div class="controls" aria-label="Filter data domains">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="small">Small but valuable</button>
+        <button class="chip" data-filter="medium">Document / event heavy</button>
+        <button class="chip" data-filter="large">Storage monsters</button>
+        <button class="chip" data-filter="future">Future bandwidth</button>
+      </div>
+      <div class="data-grid" id="dataGrid">
+        <article class="card data-card" data-cat="small"><div class="domain">Body</div><h3>Wearables / health time series</h3><p>Heart rate, HRV, sleep, steps, workouts, SpO₂, temperature, respiratory rate, medications, weight, nutrition, CGM.</p><div class="sizes"><div class="size"><b>50–500 MB/yr</b><span>average raw</span></div><div class="size"><b>20–300 MB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="small"><div class="domain">Time</div><h3>Calendar / schedule / tasks</h3><p>Calendar copies, recurring event expansion, attendees, locations, reminders, to-dos, travel buffers, free/busy.</p><div class="sizes"><div class="size"><b>5–50 MB/yr</b><span>average raw</span></div><div class="size"><b>5–100 MB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="small"><div class="domain">Place</div><h3>Self-location timeline</h3><p>GPS/fused location, visits, routes, dwell time, semantic places, geofences, commute patterns.</p><div class="sizes"><div class="size"><b>50–500 MB/yr</b><span>average raw</span></div><div class="size"><b>20–500 MB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="small"><div class="domain">Possessions</div><h3>Traceable things</h3><p>Car, bike, bags, keys, pets, shared devices, packages, important possessions, location histories.</p><div class="sizes"><div class="size"><b>10–500 MB/yr</b><span>average raw</span></div><div class="size"><b>10–500 MB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="small"><div class="domain">Taste</div><h3>Watch / listen history</h3><p>TV, movies, music, podcasts, audiobooks, progress, skips, likes, playlists, ratings, devices, genres.</p><div class="sizes"><div class="size"><b>15–150 MB/yr</b><span>average raw</span></div><div class="size"><b>15–300 MB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="medium"><div class="domain">Commerce</div><h3>Receipts / purchases</h3><p>Every receipt, OCR, SKU/item lines, merchant, warranty, return window, subscription, household inventory link.</p><div class="sizes"><div class="size"><b>200 MB–2 GB/yr</b><span>average raw</span></div><div class="size"><b>10–200 MB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="medium"><div class="domain">Money</div><h3>Financial transactions</h3><p>Bank/card transactions, balances, subscriptions, tax forms, bills, insurance, loans, investments, statements.</p><div class="sizes"><div class="size"><b>50 MB–1 GB/yr</b><span>average raw</span></div><div class="size"><b>10–500 MB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="medium"><div class="domain">Paper</div><h3>Physical mail scans</h3><p>Household mail, OCR, sender, topic, due dates, account references, policies, notices, local-government mail.</p><div class="sizes"><div class="size"><b>500 MB–3 GB/yr</b><span>average raw</span></div><div class="size"><b>50 MB–1 GB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="medium"><div class="domain">Documents</div><h3>Personal files</h3><p>PDFs, IDs, leases, contracts, warranties, manuals, school records, notes, bookmarks, saved pages.</p><div class="sizes"><div class="size"><b>1–20 GB/yr</b><span>average raw</span></div><div class="size"><b>100 MB–10 GB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="small"><div class="domain">Digital behavior</div><h3>Browser / app usage</h3><p>URLs, searches, app sessions, screen-time categories, saved items, carts, forms, downloads, non-message notifications.</p><div class="sizes"><div class="size"><b>20–200 MB/yr</b><span>average raw</span></div><div class="size"><b>20 MB–1 GB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="small"><div class="domain">Preferences</div><h3>Service + assistant preferences</h3><p>Sizes, dietary rules, travel preferences, seat choices, household rules, notification settings, privacy settings, escalation rules.</p><div class="sizes"><div class="size"><b>1–50 MB/yr</b><span>average raw</span></div><div class="size"><b>1–500 MB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="medium"><div class="domain">Health system</div><h3>Medical records</h3><p>EHR exports, labs, medications, immunizations, diagnoses, visit notes, referrals, claims, imaging, care plans.</p><div class="sizes"><div class="size"><b>50–500 MB/yr</b><span>average raw</span></div><div class="size"><b>50 MB–5 GB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="medium"><div class="domain">Home</div><h3>IoT / smart-home events</h3><p>Thermostats, locks, lights, appliances, energy, water, air quality, motion, occupancy, leak sensors, garage, alarms.</p><div class="sizes"><div class="size"><b>50–500 MB/yr</b><span>average raw</span></div><div class="size"><b>50 MB–5 GB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="large"><div class="domain">Home video</div><h3>Cameras / doorbells</h3><p>Event clips, people/package/vehicle detections, zones, timestamps, OCR, household security context.</p><div class="sizes"><div class="size"><b>5–100 GB/yr</b><span>event-only average</span></div><div class="size"><b>100 MB–20 GB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="large"><div class="domain">Mobility</div><h3>Smart-car telemetry</h3><p>Trips, charging/fuel, odometer, battery, diagnostics, driving behavior, maintenance, locations, in-cabin settings.</p><div class="sizes"><div class="size"><b>100 MB–5 GB/yr</b><span>normalized API</span></div><div class="size"><b>100 GB–10 TB/yr</b><span>raw-rich logs</span></div></div></article>
+        <article class="card data-card" data-cat="large"><div class="domain">Media</div><h3>Photos / videos / screenshots</h3><p>Camera roll, screenshots, metadata, faces, places, objects, OCR, events, albums, receipt photos.</p><div class="sizes"><div class="size"><b>20–200 GB/yr</b><span>average raw</span></div><div class="size"><b>1–50 GB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="future"><div class="domain">World model</div><h3>Smart glasses / first-person cameras</h3><p>First-person video, audio, gaze, scene events, OCR, objects, people, places, tasks, episodic summaries.</p><div class="sizes"><div class="size"><b>0.5–5 TB/yr</b><span>early user</span></div><div class="size"><b>5–100+ GB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="future"><div class="domain">Audio</div><h3>Ambient audio / voice notes</h3><p>Voice memos, meeting recordings where permitted, environment labels, reminders, personal dictation, non-message speech.</p><div class="sizes"><div class="size"><b>1–100 GB/yr</b><span>average raw</span></div><div class="size"><b>100 MB–50 GB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="medium"><div class="domain">Travel</div><h3>Travel / mobility artifacts</h3><p>Tickets, boarding passes, hotel/car reservations, itineraries, visas, loyalty programs, trip photos, expense docs.</p><div class="sizes"><div class="size"><b>50 MB–2 GB/yr</b><span>average raw</span></div><div class="size"><b>10 MB–2 GB/yr</b><span>normalized</span></div></div></article>
+        <article class="card data-card" data-cat="medium"><div class="domain">Inventory</div><h3>Home / possession graph</h3><p>Appliances, furniture, clothes, pantry, warranties, serial numbers, maintenance, subscriptions, ownership history.</p><div class="sizes"><div class="size"><b>100 MB–5 GB/yr</b><span>average raw</span></div><div class="size"><b>50 MB–10 GB/yr</b><span>normalized</span></div></div></article>
+      </div>
+    </section>
+
+    <section id="scenarios">
+      <div class="section-head">
+        <h2>Three present-day user scenarios</h2>
+        <p>The structured knowledge graph stays manageable. The raw archive becomes strategically important precisely because it is too large and too messy for every agent builder to reconstruct.</p>
+      </div>
+      <div class="scenario">
+        <div class="card"><span class="tag">Average</span><h3>Normal consumer</h3><div class="range">25–300 GB/yr</div><p class="subtle">Mostly photos, videos, scanned mail, receipts, a few wearables, calendars, location, and maybe home-camera clips.</p><ul><li>Normalized: 0.5–5 GB/yr</li><li>Dominant driver: camera roll</li><li>Life API: cheap and fast</li></ul></div>
+        <div class="card"><span class="tag">Power</span><h3>Quantified / connected user</h3><div class="range">1–30 TB/yr</div><p class="subtle">Many sensors, heavy media, smart home, car telemetry, medical imaging, business or family document flows.</p><ul><li>Normalized: 10–100+ GB/yr</li><li>Dominant driver: video + telemetry</li><li>Needs retention tiers</li></ul></div>
+        <div class="card"><span class="tag">Extreme</span><h3>Creator / many-camera household</h3><div class="range">30–200+ TB/yr</div><p class="subtle">Continuous cameras, AV-like logs, rich media production, dense world capture, large household/estate graph.</p><ul><li>Normalized: 100 GB–1 TB/yr</li><li>Dominant driver: raw media</li><li>Potentially PB-scale in future</li></ul></div>
+      </div>
+    </section>
+
+    <section id="future">
+      <div class="section-head">
+        <h2>Smart glasses are the storage inflection point</h2>
+        <p>At Apple’s published spatial-video figure of about 130 MB/minute, modest first-person capture quickly becomes TB-scale.</p>
+      </div>
+      <div class="glasses">
+        <div class="card calc">
+          <h3>First-person video calculator</h3>
+          <label for="minutes">Minutes captured per day: <strong id="minutesLabel">30</strong></label>
+          <input id="minutes" type="range" min="1" max="720" value="30" />
+          <div class="calc-output" id="calcOut">1.4 TB/yr<small>Assumes 130 MB/minute, 365 days/year.</small></div>
+        </div>
+        <div class="card">
+          <h3>Annual archive size by capture habit</h3>
+          <div class="bar-list">
+            <div class="bar-row"><span>1 min/day</span><div class="bar"><i style="--w:1%"></i></div><span>47 GB</span></div>
+            <div class="bar-row"><span>10 min/day</span><div class="bar"><i style="--w:8%"></i></div><span>475 GB</span></div>
+            <div class="bar-row"><span>30 min/day</span><div class="bar"><i style="--w:24%"></i></div><span>1.4 TB</span></div>
+            <div class="bar-row"><span>1 hr/day</span><div class="bar"><i style="--w:48%"></i></div><span>2.8 TB</span></div>
+            <div class="bar-row"><span>4 hr/day</span><div class="bar"><i style="--w:86%"></i></div><span>11.4 TB</span></div>
+            <div class="bar-row"><span>12 hr/day</span><div class="bar"><i style="--w:100%"></i></div><span>34 TB</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>High-value, low-byte context</h2>
+        <p>The data that makes agents excellent is often tiny. Its value comes from being normalized, current, permissioned, and connected to provenance.</p>
+      </div>
+      <div class="grid-3 product">
+        <div class="card"><h3>Preference graph</h3><p>Seat, hotel, food, travel, shopping, accessibility, notification, privacy, and household preferences.</p></div>
+        <div class="card"><h3>Possession graph</h3><p>What the user owns, what breaks, what needs replacing, what is under warranty, what has compatible parts.</p></div>
+        <div class="card"><h3>Place graph</h3><p>Home, work, doctors, schools, favorite stores, gyms, recurring errands, avoided locations, commute patterns.</p></div>
+        <div class="card"><h3>Medical constraints</h3><p>Allergies, medications, care plans, clinicians, labs, insurance, diagnoses, and high-salience care instructions.</p></div>
+        <div class="card"><h3>Personal admin graph</h3><p>IDs, policies, taxes, bills, deadlines, applications, licenses, renewals, local-government interactions.</p></div>
+        <div class="card"><h3>Taste graph</h3><p>What the user watches, listens to, reads, buys, skips, saves, returns, rates, and recommends.</p></div>
+      </div>
+    </section>
+
+    <section id="architecture">
+      <div class="section-head">
+        <h2>Recommended platform architecture</h2>
+        <p>Do not build one monolithic memory store. Build a tiered context platform with hot facts, warm time series, graphs, vectors, raw archive, and policy.</p>
+      </div>
+      <div class="architecture">
+        <div class="arch-step"><b>Hot context</b><span>Current facts, active tasks, recent events, high-confidence preferences, summaries.</span></div>
+        <div class="arch-step"><b>Warm time series</b><span>Health, location, transactions, smart home, calendar, media, app events.</span></div>
+        <div class="arch-step"><b>Knowledge graph</b><span>People, places, possessions, providers, accounts, devices, entities, relationships.</span></div>
+        <div class="arch-step"><b>Semantic layer</b><span>Embeddings over docs, scans, images, clips, OCR, summaries, and multimodal extracts.</span></div>
+        <div class="arch-step"><b>Cold archive</b><span>PDFs, scans, photos, videos, exports, DICOM, car logs, raw sensor streams.</span></div>
+        <div class="arch-step"><b>Policy layer</b><span>Consent, scope, retention, deletion, correction, audit, and agent permissions.</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>Life API examples</h2>
+        <p>Agents should call organized endpoints. They should not perform raw ingest, OCR, deduplication, schema inference, or compaction themselves.</p>
+      </div>
+      <div class="endpoints">
+        <div class="endpoint">GET /life/location/visits?range=2026-01-01..2026-05-29</div>
+        <div class="endpoint">GET /life/health/sleep?range=last_90_days</div>
+        <div class="endpoint">GET /life/purchases/items?merchant=Home%20Depot</div>
+        <div class="endpoint">GET /life/preferences/travel</div>
+        <div class="endpoint">GET /life/documents/search?q=warranty%20water%20heater</div>
+        <div class="endpoint">GET /life/possessions/warranties/expiring</div>
+        <div class="endpoint">GET /life/media/taste/profile</div>
+        <div class="endpoint">GET /life/context/briefing?task=book_trip</div>
+      </div>
+    </section>
+
+    <section>
+      <div class="callout">
+        <p class="quote">A memory provider stores what an agent learned. Fulcra stores what a person’s life produces.</p>
+        <p class="subtle">For today’s users, that is tens to hundreds of GB per year of raw personal context, compressible into GB-scale normalized knowledge. For power users, it is already TB-scale. Once first-person cameras, richer car telemetry, medical imaging, and home sensors become normal, the context-gathering layer becomes tens to hundreds of TB per user per year unless aggressively summarized and tiered.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="footnotes">
+        <p><strong>Notes.</strong> This briefing is an order-of-magnitude sizing model. Ranges separate raw retained artifacts from normalized agent-ready context. The omitted category is private messaging bodies such as email and text messages. Figures should be refined with source-specific exports, retention policy, compression assumptions, and Fulcra’s actual schema sizes.</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const buttons = document.querySelectorAll('[data-filter]');
+    const cards = document.querySelectorAll('.data-card');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.dataset.filter;
+        cards.forEach(card => {
+          card.classList.toggle('hide', filter !== 'all' && card.dataset.cat !== filter);
+        });
+      });
+    });
+
+    const slider = document.getElementById('minutes');
+    const label = document.getElementById('minutesLabel');
+    const out = document.getElementById('calcOut');
+    function formatGB(gb) {
+      if (gb < 1000) return Math.round(gb).toLocaleString() + ' GB/yr';
+      return (gb / 1000).toFixed(gb < 10000 ? 1 : 0) + ' TB/yr';
+    }
+    function updateCalc() {
+      const m = Number(slider.value);
+      label.textContent = m.toLocaleString();
+      const gb = m * 130 * 365 / 1000;
+      out.innerHTML = formatGB(gb) + '<small>Assumes 130 MB/minute, 365 days/year.</small>';
+    }
+    slider.addEventListener('input', updateCalc);
+    updateCalc();
+  </script>
+</body>
+</html>
