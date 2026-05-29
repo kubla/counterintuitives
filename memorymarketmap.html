@@ -388,10 +388,18 @@
                 color: var(--text);
             }
 
-            .matrix thead th {
+            .matrix.sticky-head thead th {
                 position: sticky;
                 top: 66px;
                 z-index: 3;
+                background: linear-gradient(
+                    180deg,
+                    rgba(36, 43, 70, 0.98),
+                    rgba(29, 36, 61, 0.98)
+                );
+                box-shadow:
+                    0 1px 0 var(--line),
+                    0 12px 20px rgba(0, 0, 0, 0.24);
             }
 
             .matrix tr:last-child td {
