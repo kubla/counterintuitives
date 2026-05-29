@@ -1,871 +1,1700 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Agent Memory Market Briefing: OpenClaw & Hermes Providers</title>
-  <style>
-    :root {
-      --bg: #0c1020;
-      --bg2: #111831;
-      --panel: rgba(255,255,255,0.075);
-      --panel2: rgba(255,255,255,0.105);
-      --text: #eef3ff;
-      --muted: #aab5d6;
-      --faint: #7480a8;
-      --line: rgba(255,255,255,0.14);
-      --accent: #8fd3ff;
-      --accent2: #d7b3ff;
-      --accent3: #8ff0c5;
-      --warn: #ffd18f;
-      --danger: #ff9c9c;
-      --shadow: 0 18px 60px rgba(0,0,0,0.32);
-      --radius: 22px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --serif: ui-serif, Georgia, "Times New Roman", serif;
-    }
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Agent Memory Market Briefing: OpenClaw & Hermes Providers</title>
+        <style>
+            :root {
+                --bg: #0c1020;
+                --bg2: #111831;
+                --panel: rgba(255, 255, 255, 0.075);
+                --panel2: rgba(255, 255, 255, 0.105);
+                --text: #eef3ff;
+                --muted: #aab5d6;
+                --faint: #7480a8;
+                --line: rgba(255, 255, 255, 0.14);
+                --accent: #8fd3ff;
+                --accent2: #d7b3ff;
+                --accent3: #8ff0c5;
+                --warn: #ffd18f;
+                --danger: #ff9c9c;
+                --shadow: 0 18px 60px rgba(0, 0, 0, 0.32);
+                --radius: 22px;
+                --mono:
+                    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+                    "Liberation Mono", monospace;
+                --sans:
+                    Inter, ui-sans-serif, system-ui, -apple-system,
+                    BlinkMacSystemFont, "Segoe UI", sans-serif;
+                --serif: ui-serif, Georgia, "Times New Roman", serif;
+            }
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      font-family: var(--sans);
-      background:
-        radial-gradient(circle at 20% -10%, rgba(143,211,255,0.28), transparent 35%),
-        radial-gradient(circle at 95% 0%, rgba(215,179,255,0.22), transparent 32%),
-        radial-gradient(circle at 50% 105%, rgba(143,240,197,0.13), transparent 35%),
-        linear-gradient(180deg, var(--bg) 0%, #080b16 100%);
-      color: var(--text);
-      line-height: 1.55;
-    }
+            * {
+                box-sizing: border-box;
+            }
+            html {
+                scroll-behavior: smooth;
+            }
+            body {
+                margin: 0;
+                font-family: var(--sans);
+                background:
+                    radial-gradient(
+                        circle at 20% -10%,
+                        rgba(143, 211, 255, 0.28),
+                        transparent 35%
+                    ),
+                    radial-gradient(
+                        circle at 95% 0%,
+                        rgba(215, 179, 255, 0.22),
+                        transparent 32%
+                    ),
+                    radial-gradient(
+                        circle at 50% 105%,
+                        rgba(143, 240, 197, 0.13),
+                        transparent 35%
+                    ),
+                    linear-gradient(180deg, var(--bg) 0%, #080b16 100%);
+                color: var(--text);
+                line-height: 1.55;
+            }
 
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
+            a {
+                color: var(--accent);
+                text-decoration: none;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
 
-    .shell { max-width: 1220px; margin: 0 auto; padding: 28px; }
+            .shell {
+                max-width: 1220px;
+                margin: 0 auto;
+                padding: 28px;
+            }
 
-    header.hero {
-      min-height: 78vh;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 34px;
-      align-items: center;
-      padding: 42px 0 30px;
-    }
+            header.hero {
+                min-height: 78vh;
+                display: grid;
+                grid-template-columns: 1.1fr 0.9fr;
+                gap: 34px;
+                align-items: center;
+                padding: 42px 0 30px;
+            }
 
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 13px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(255,255,255,0.06);
-      color: var(--muted);
-      font-size: 13px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      backdrop-filter: blur(18px);
-    }
+            .eyebrow {
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                padding: 8px 13px;
+                border: 1px solid var(--line);
+                border-radius: 999px;
+                background: rgba(255, 255, 255, 0.06);
+                color: var(--muted);
+                font-size: 13px;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                backdrop-filter: blur(18px);
+            }
 
-    .dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: var(--accent3);
-      box-shadow: 0 0 22px rgba(143,240,197,.8);
-    }
+            .dot {
+                width: 9px;
+                height: 9px;
+                border-radius: 50%;
+                background: var(--accent3);
+                box-shadow: 0 0 22px rgba(143, 240, 197, 0.8);
+            }
 
-    h1 {
-      font-size: clamp(44px, 7.5vw, 92px);
-      line-height: 0.94;
-      letter-spacing: -0.075em;
-      margin: 24px 0 18px;
-    }
+            h1 {
+                font-size: clamp(44px, 7.5vw, 92px);
+                line-height: 0.94;
+                letter-spacing: -0.075em;
+                margin: 24px 0 18px;
+            }
 
-    .subtitle {
-      font-size: clamp(18px, 2vw, 23px);
-      color: var(--muted);
-      max-width: 760px;
-      margin: 0 0 28px;
-    }
+            .subtitle {
+                font-size: clamp(18px, 2vw, 23px);
+                color: var(--muted);
+                max-width: 760px;
+                margin: 0 0 28px;
+            }
 
-    .thesis {
-      border-left: 3px solid var(--accent);
-      padding: 18px 20px;
-      background: rgba(143,211,255,0.08);
-      border-radius: 0 18px 18px 0;
-      color: #e9f6ff;
-      font-size: 18px;
-      max-width: 780px;
-    }
+            .thesis {
+                border-left: 3px solid var(--accent);
+                padding: 18px 20px;
+                background: rgba(143, 211, 255, 0.08);
+                border-radius: 0 18px 18px 0;
+                color: #e9f6ff;
+                font-size: 18px;
+                max-width: 780px;
+            }
 
-    .hero-card {
-      border: 1px solid var(--line);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.055)),
-        rgba(255,255,255,0.06);
-      border-radius: 32px;
-      padding: 28px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(20px);
-      position: relative;
-      overflow: hidden;
-    }
+            .hero-card {
+                border: 1px solid var(--line);
+                background:
+                    linear-gradient(
+                        180deg,
+                        rgba(255, 255, 255, 0.12),
+                        rgba(255, 255, 255, 0.055)
+                    ),
+                    rgba(255, 255, 255, 0.06);
+                border-radius: 32px;
+                padding: 28px;
+                box-shadow: var(--shadow);
+                backdrop-filter: blur(20px);
+                position: relative;
+                overflow: hidden;
+            }
 
-    .hero-card:before {
-      content: "";
-      position: absolute;
-      inset: -30% -25% auto auto;
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      background: rgba(143,211,255,.15);
-      filter: blur(10px);
-    }
+            .hero-card:before {
+                content: "";
+                position: absolute;
+                inset: -30% -25% auto auto;
+                width: 260px;
+                height: 260px;
+                border-radius: 50%;
+                background: rgba(143, 211, 255, 0.15);
+                filter: blur(10px);
+            }
 
-    .metric-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 14px;
-      margin-top: 22px;
-      position: relative;
-    }
+            .metric-grid {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 14px;
+                margin-top: 22px;
+                position: relative;
+            }
 
-    .metric {
-      padding: 18px;
-      border-radius: 20px;
-      background: rgba(0,0,0,0.18);
-      border: 1px solid var(--line);
-    }
+            .metric {
+                padding: 18px;
+                border-radius: 20px;
+                background: rgba(0, 0, 0, 0.18);
+                border: 1px solid var(--line);
+            }
 
-    .metric strong {
-      display: block;
-      font-size: 34px;
-      line-height: 1;
-      letter-spacing: -0.04em;
-      margin-bottom: 8px;
-    }
+            .metric strong {
+                display: block;
+                font-size: 34px;
+                line-height: 1;
+                letter-spacing: -0.04em;
+                margin-bottom: 8px;
+            }
 
-    .metric span { color: var(--muted); font-size: 13px; }
+            .metric span {
+                color: var(--muted);
+                font-size: 13px;
+            }
 
-    nav.toc {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      margin: 12px 0 36px;
-      padding: 10px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(8,11,22,0.78);
-      backdrop-filter: blur(24px);
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      box-shadow: 0 10px 36px rgba(0,0,0,.24);
-    }
+            nav.toc {
+                position: sticky;
+                top: 0;
+                z-index: 50;
+                margin: 12px 0 36px;
+                padding: 10px;
+                border: 1px solid var(--line);
+                border-radius: 999px;
+                background: rgba(8, 11, 22, 0.78);
+                backdrop-filter: blur(24px);
+                display: flex;
+                gap: 8px;
+                overflow-x: auto;
+                box-shadow: 0 10px 36px rgba(0, 0, 0, 0.24);
+            }
 
-    nav.toc a {
-      white-space: nowrap;
-      color: var(--muted);
-      padding: 9px 14px;
-      border-radius: 999px;
-      font-size: 14px;
-    }
-    nav.toc a:hover { background: rgba(255,255,255,0.09); color: var(--text); text-decoration: none; }
+            nav.toc a {
+                white-space: nowrap;
+                color: var(--muted);
+                padding: 9px 14px;
+                border-radius: 999px;
+                font-size: 14px;
+            }
+            nav.toc a:hover {
+                background: rgba(255, 255, 255, 0.09);
+                color: var(--text);
+                text-decoration: none;
+            }
 
-    section {
-      margin: 58px 0;
-      scroll-margin-top: 90px;
-    }
+            section {
+                margin: 58px 0;
+                scroll-margin-top: 90px;
+            }
 
-    .section-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: end;
-      gap: 28px;
-      margin-bottom: 22px;
-    }
+            .section-head {
+                display: flex;
+                justify-content: space-between;
+                align-items: end;
+                gap: 28px;
+                margin-bottom: 22px;
+            }
 
-    h2 {
-      font-size: clamp(30px, 4vw, 50px);
-      line-height: 1.02;
-      letter-spacing: -0.055em;
-      margin: 0;
-    }
+            h2 {
+                font-size: clamp(30px, 4vw, 50px);
+                line-height: 1.02;
+                letter-spacing: -0.055em;
+                margin: 0;
+            }
 
-    .section-kicker {
-      color: var(--accent3);
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: .12em;
-      margin-bottom: 8px;
-      font-weight: 700;
-    }
+            .section-kicker {
+                color: var(--accent3);
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: 0.12em;
+                margin-bottom: 8px;
+                font-weight: 700;
+            }
 
-    .section-note {
-      color: var(--muted);
-      max-width: 520px;
-      margin: 0;
-    }
+            .section-note {
+                color: var(--muted);
+                max-width: 520px;
+                margin: 0;
+            }
 
-    .grid { display: grid; gap: 18px; }
-    .grid.cols-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
-    .grid.cols-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+            .grid {
+                display: grid;
+                gap: 18px;
+            }
+            .grid.cols-3 {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+            .grid.cols-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
 
-    .card {
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--panel);
-      padding: 22px;
-      box-shadow: 0 10px 34px rgba(0,0,0,.18);
-      backdrop-filter: blur(18px);
-    }
+            .card {
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: var(--panel);
+                padding: 22px;
+                box-shadow: 0 10px 34px rgba(0, 0, 0, 0.18);
+                backdrop-filter: blur(18px);
+            }
 
-    .card h3 {
-      margin: 0 0 8px;
-      letter-spacing: -0.03em;
-      font-size: 22px;
-      line-height: 1.1;
-    }
+            .card h3 {
+                margin: 0 0 8px;
+                letter-spacing: -0.03em;
+                font-size: 22px;
+                line-height: 1.1;
+            }
 
-    .card p { color: var(--muted); margin: 8px 0 0; }
-    .card .small { font-size: 13px; color: var(--faint); }
+            .card p {
+                color: var(--muted);
+                margin: 8px 0 0;
+            }
+            .card .small {
+                font-size: 13px;
+                color: var(--faint);
+            }
 
-    .pill-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 14px;
-    }
+            .pill-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 14px;
+            }
 
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 12px;
-      color: var(--muted);
-      background: rgba(255,255,255,.055);
-    }
+            .pill {
+                display: inline-flex;
+                align-items: center;
+                gap: 7px;
+                border: 1px solid var(--line);
+                border-radius: 999px;
+                padding: 6px 10px;
+                font-size: 12px;
+                color: var(--muted);
+                background: rgba(255, 255, 255, 0.055);
+            }
 
-    .pill.hot { color: #0c1020; background: var(--accent3); border-color: transparent; font-weight: 700; }
-    .pill.api { border-color: rgba(143,211,255,.35); color: #ccefff; }
-    .pill.local { border-color: rgba(215,179,255,.35); color: #ecdfff; }
-    .pill.enterprise { border-color: rgba(255,209,143,.35); color: #ffe0af; }
+            .pill.hot {
+                color: #0c1020;
+                background: var(--accent3);
+                border-color: transparent;
+                font-weight: 700;
+            }
+            .pill.api {
+                border-color: rgba(143, 211, 255, 0.35);
+                color: #ccefff;
+            }
+            .pill.local {
+                border-color: rgba(215, 179, 255, 0.35);
+                color: #ecdfff;
+            }
+            .pill.enterprise {
+                border-color: rgba(255, 209, 143, 0.35);
+                color: #ffe0af;
+            }
 
-    .tabs {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin: 0 0 18px;
-    }
+            .tabs {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                margin: 0 0 18px;
+            }
 
-    button.tab, button.filter, button.reset {
-      appearance: none;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.06);
-      color: var(--muted);
-      padding: 10px 14px;
-      border-radius: 999px;
-      cursor: pointer;
-      font: inherit;
-      font-size: 14px;
-    }
+            button.tab,
+            button.filter,
+            button.reset {
+                appearance: none;
+                border: 1px solid var(--line);
+                background: rgba(255, 255, 255, 0.06);
+                color: var(--muted);
+                padding: 10px 14px;
+                border-radius: 999px;
+                cursor: pointer;
+                font: inherit;
+                font-size: 14px;
+            }
 
-    button.tab.active, button.filter.active {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #07101c;
-      border-color: transparent;
-      font-weight: 800;
-    }
+            button.tab.active,
+            button.filter.active {
+                background: linear-gradient(
+                    135deg,
+                    var(--accent),
+                    var(--accent2)
+                );
+                color: #07101c;
+                border-color: transparent;
+                font-weight: 800;
+            }
 
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+            .tab-panel {
+                display: none;
+            }
+            .tab-panel.active {
+                display: block;
+            }
 
-    .matrix {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      background: var(--panel);
-    }
+            .matrix {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                overflow: hidden;
+                border: 1px solid var(--line);
+                border-radius: 22px;
+                background: var(--panel);
+            }
 
-    .matrix th, .matrix td {
-      padding: 14px 14px;
-      border-bottom: 1px solid var(--line);
-      vertical-align: top;
-      text-align: left;
-      font-size: 14px;
-    }
+            .matrix th,
+            .matrix td {
+                padding: 14px 14px;
+                border-bottom: 1px solid var(--line);
+                vertical-align: top;
+                text-align: left;
+                font-size: 14px;
+            }
 
-    .matrix th {
-      background: rgba(255,255,255,0.08);
-      color: var(--text);
-      position: sticky;
-      top: 66px;
-      z-index: 3;
-    }
+            .matrix th {
+                background: rgba(255, 255, 255, 0.08);
+                color: var(--text);
+                position: sticky;
+                top: 66px;
+                z-index: 3;
+            }
 
-    .matrix tr:last-child td { border-bottom: 0; }
-    .matrix td { color: var(--muted); }
-    .matrix b { color: var(--text); }
+            .matrix tr:last-child td {
+                border-bottom: 0;
+            }
+            .matrix td {
+                color: var(--muted);
+            }
+            .matrix b {
+                color: var(--text);
+            }
 
-    .score {
-      font-family: var(--mono);
-      font-size: 12px;
-      padding: 3px 7px;
-      border-radius: 999px;
-      display: inline-block;
-      border: 1px solid var(--line);
-      color: var(--text);
-      background: rgba(255,255,255,.06);
-    }
+            .score {
+                font-family: var(--mono);
+                font-size: 12px;
+                padding: 3px 7px;
+                border-radius: 999px;
+                display: inline-block;
+                border: 1px solid var(--line);
+                color: var(--text);
+                background: rgba(255, 255, 255, 0.06);
+            }
 
-    .score.high { background: rgba(143,240,197,.16); color: #c8ffe9; }
-    .score.med { background: rgba(143,211,255,.13); color: #d8f3ff; }
-    .score.low { background: rgba(255,156,156,.12); color: #ffd1d1; }
+            .score.high {
+                background: rgba(143, 240, 197, 0.16);
+                color: #c8ffe9;
+            }
+            .score.med {
+                background: rgba(143, 211, 255, 0.13);
+                color: #d8f3ff;
+            }
+            .score.low {
+                background: rgba(255, 156, 156, 0.12);
+                color: #ffd1d1;
+            }
 
-    .vendor-controls {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
+            .vendor-controls {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 18px;
+            }
 
-    .vendor-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap: 16px;
-    }
+            .vendor-grid {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 16px;
+            }
 
-    .vendor-card {
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      background: rgba(255,255,255,.075);
-      padding: 18px;
-      min-height: 265px;
-      transition: transform .18s ease, background .18s ease, border-color .18s ease;
-      overflow: hidden;
-      position: relative;
-    }
+            .vendor-card {
+                border: 1px solid var(--line);
+                border-radius: 24px;
+                background: rgba(255, 255, 255, 0.075);
+                padding: 18px;
+                min-height: 265px;
+                transition:
+                    transform 0.18s ease,
+                    background 0.18s ease,
+                    border-color 0.18s ease;
+                overflow: hidden;
+                position: relative;
+            }
 
-    .vendor-card:hover {
-      transform: translateY(-3px);
-      background: rgba(255,255,255,.105);
-      border-color: rgba(143,211,255,.42);
-    }
+            .vendor-card:hover {
+                transform: translateY(-3px);
+                background: rgba(255, 255, 255, 0.105);
+                border-color: rgba(143, 211, 255, 0.42);
+            }
 
-    .vendor-card h3 {
-      margin: 0 0 6px;
-      font-size: 24px;
-      letter-spacing: -.04em;
-    }
+            .vendor-card h3 {
+                margin: 0 0 6px;
+                font-size: 24px;
+                letter-spacing: -0.04em;
+            }
 
-    .vendor-card .category { color: var(--accent3); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
-    .vendor-card p { color: var(--muted); margin: 10px 0; font-size: 14px; }
+            .vendor-card .category {
+                color: var(--accent3);
+                font-size: 12px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+            }
+            .vendor-card p {
+                color: var(--muted);
+                margin: 10px 0;
+                font-size: 14px;
+            }
 
-    details {
-      border-top: 1px solid var(--line);
-      padding-top: 11px;
-      margin-top: 12px;
-    }
+            details {
+                border-top: 1px solid var(--line);
+                padding-top: 11px;
+                margin-top: 12px;
+            }
 
-    summary {
-      cursor: pointer;
-      color: var(--accent);
-      font-weight: 700;
-      font-size: 14px;
-    }
+            summary {
+                cursor: pointer;
+                color: var(--accent);
+                font-weight: 700;
+                font-size: 14px;
+            }
 
-    .mini-list {
-      margin: 10px 0 0;
-      padding-left: 17px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .mini-list li { margin: 5px 0; }
+            .mini-list {
+                margin: 10px 0 0;
+                padding-left: 17px;
+                color: var(--muted);
+                font-size: 13px;
+            }
+            .mini-list li {
+                margin: 5px 0;
+            }
 
-    .journey {
-      position: relative;
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
-      margin-top: 18px;
-    }
+            .journey {
+                position: relative;
+                display: grid;
+                grid-template-columns: repeat(5, 1fr);
+                gap: 12px;
+                margin-top: 18px;
+            }
 
-    .step {
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.075);
-      border-radius: 20px;
-      padding: 16px;
-      min-height: 150px;
-    }
+            .step {
+                border: 1px solid var(--line);
+                background: rgba(255, 255, 255, 0.075);
+                border-radius: 20px;
+                padding: 16px;
+                min-height: 150px;
+            }
 
-    .step .num {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #07101c;
-      font-weight: 900;
-      margin-bottom: 10px;
-    }
+            .step .num {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(
+                    135deg,
+                    var(--accent),
+                    var(--accent2)
+                );
+                color: #07101c;
+                font-weight: 900;
+                margin-bottom: 10px;
+            }
 
-    .step h3 { font-size: 17px; margin: 0 0 6px; letter-spacing: -.03em; }
-    .step p { margin: 0; color: var(--muted); font-size: 13px; }
+            .step h3 {
+                font-size: 17px;
+                margin: 0 0 6px;
+                letter-spacing: -0.03em;
+            }
+            .step p {
+                margin: 0;
+                color: var(--muted);
+                font-size: 13px;
+            }
 
-    .supermemory-comparison {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
+            .supermemory-comparison {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 18px;
+            }
 
-    .big-quote {
-      font-family: var(--serif);
-      font-size: clamp(24px, 3vw, 38px);
-      line-height: 1.12;
-      color: #f8fbff;
-      margin: 0;
-      letter-spacing: -.025em;
-    }
+            .big-quote {
+                font-family: var(--serif);
+                font-size: clamp(24px, 3vw, 38px);
+                line-height: 1.12;
+                color: #f8fbff;
+                margin: 0;
+                letter-spacing: -0.025em;
+            }
 
-    .quote-card {
-      background: linear-gradient(135deg, rgba(143,211,255,.14), rgba(215,179,255,.10));
-      border: 1px solid rgba(143,211,255,.25);
-    }
+            .quote-card {
+                background: linear-gradient(
+                    135deg,
+                    rgba(143, 211, 255, 0.14),
+                    rgba(215, 179, 255, 0.1)
+                );
+                border: 1px solid rgba(143, 211, 255, 0.25);
+            }
 
-    .footer {
-      color: var(--faint);
-      font-size: 13px;
-      padding: 34px 0 60px;
-      border-top: 1px solid var(--line);
-      margin-top: 70px;
-    }
+            .footer {
+                color: var(--faint);
+                font-size: 13px;
+                padding: 34px 0 60px;
+                border-top: 1px solid var(--line);
+                margin-top: 70px;
+            }
 
-    .source-list {
-      columns: 2;
-      column-gap: 34px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-    .source-list li { break-inside: avoid; margin: 0 0 8px; }
+            .source-list {
+                columns: 2;
+                column-gap: 34px;
+                font-size: 13px;
+                color: var(--muted);
+            }
+            .source-list li {
+                break-inside: avoid;
+                margin: 0 0 8px;
+            }
 
-    .hidden { display: none !important; }
+            .hidden {
+                display: none !important;
+            }
 
-    @media (max-width: 960px) {
-      header.hero { grid-template-columns: 1fr; min-height: auto; }
-      .grid.cols-3, .grid.cols-2, .vendor-grid, .supermemory-comparison { grid-template-columns: 1fr; }
-      .journey { grid-template-columns: 1fr; }
-      .section-head { display: block; }
-      .section-note { margin-top: 10px; }
-      .matrix { display: block; overflow-x: auto; }
-      .source-list { columns: 1; }
-    }
+            @media (max-width: 960px) {
+                header.hero {
+                    grid-template-columns: 1fr;
+                    min-height: auto;
+                }
+                .grid.cols-3,
+                .grid.cols-2,
+                .vendor-grid,
+                .supermemory-comparison {
+                    grid-template-columns: 1fr;
+                }
+                .journey {
+                    grid-template-columns: 1fr;
+                }
+                .section-head {
+                    display: block;
+                }
+                .section-note {
+                    margin-top: 10px;
+                }
+                .matrix {
+                    display: block;
+                    overflow-x: auto;
+                }
+                .source-list {
+                    columns: 1;
+                }
+            }
 
-    @media print {
-      body { background: #fff; color: #111; }
-      .hero-card, .card, .vendor-card, .step, nav.toc { box-shadow: none; background: #fff; border: 1px solid #ccc; color: #111; }
-      nav.toc, .vendor-controls, .tabs { display: none; }
-      .tab-panel { display: block; }
-      a { color: #0645ad; }
-      .shell { max-width: none; padding: 16px; }
-      header.hero { min-height: auto; }
-    }
-  </style>
-</head>
-<body>
-  <div class="shell">
-    <header class="hero">
-      <div>
-        <div class="eyebrow"><span class="dot"></span> Market briefing · agent memory</div>
-        <h1>Memory is the first tax on useful agents.</h1>
-        <p class="subtitle">A market map and GTM briefing for memory providers serving OpenClaw, Hermes, coding agents, and developer-built AI products.</p>
-        <div class="thesis">
-          The core buying moment is not “I need a database.” It is: <strong>“My agent is finally useful enough that forgetting is now the bottleneck.”</strong>
+            @media print {
+                body {
+                    background: #fff;
+                    color: #111;
+                }
+                .hero-card,
+                .card,
+                .vendor-card,
+                .step,
+                nav.toc {
+                    box-shadow: none;
+                    background: #fff;
+                    border: 1px solid #ccc;
+                    color: #111;
+                }
+                nav.toc,
+                .vendor-controls,
+                .tabs {
+                    display: none;
+                }
+                .tab-panel {
+                    display: block;
+                }
+                a {
+                    color: #0645ad;
+                }
+                .shell {
+                    max-width: none;
+                    padding: 16px;
+                }
+                header.hero {
+                    min-height: auto;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="shell">
+            <header class="hero">
+                <div>
+                    <div class="eyebrow">
+                        <span class="dot"></span> Market briefing · agent memory
+                    </div>
+                    <h1>AI Agent Memory Market Map</h1>
+                    <p class="subtitle">
+                        A market map and GTM briefing for memory providers
+                        serving OpenClaw, Hermes, coding agents, and
+                        developer-built AI products.
+                    </p>
+                    <div class="thesis">
+                        The core buying moment is not “I need a database.” It
+                        is:
+                        <strong
+                            >“My agent is finally useful enough that forgetting
+                            is now the bottleneck.”</strong
+                        >
+                    </div>
+                </div>
+                <aside class="hero-card">
+                    <h2 style="font-size: 32px; margin-bottom: 8px">
+                        Executive read
+                    </h2>
+                    <p style="color: var(--muted); margin-top: 0">
+                        OpenClaw and Hermes create high-intent adoption
+                        surfaces. The revenue pools sit one level downstream:
+                        developer infrastructure first, enterprise governance
+                        second.
+                    </p>
+                    <div class="metric-grid">
+                        <div class="metric">
+                            <strong>3</strong
+                            ><span
+                                >core audiences: power users, devs,
+                                enterprise</span
+                            >
+                        </div>
+                        <div class="metric">
+                            <strong>5</strong
+                            ><span
+                                >trigger pains: amnesia, compaction, handoff,
+                                stale facts, cost</span
+                            >
+                        </div>
+                        <div class="metric">
+                            <strong>12+</strong
+                            ><span
+                                >providers competing across local, API, graph,
+                                and platform layers</span
+                            >
+                        </div>
+                        <div class="metric">
+                            <strong>1</strong
+                            ><span
+                                >outlier: Supermemory as broader context
+                                cloud</span
+                            >
+                        </div>
+                    </div>
+                </aside>
+            </header>
+
+            <nav class="toc">
+                <a href="#shape">Market shape</a>
+                <a href="#vendors">Vendor cards</a>
+                <a href="#journeys">Customer journeys</a>
+                <a href="#supermemory">Supermemory vs. others</a>
+                <a href="#audiences">Revenue audiences</a>
+                <a href="#fulcra">Fulcra implications</a>
+                <a href="#sources">Sources</a>
+            </nav>
+
+            <section id="shape">
+                <div class="section-head">
+                    <div>
+                        <div class="section-kicker">The map</div>
+                        <h2>Four categories, one bottleneck.</h2>
+                    </div>
+                    <p class="section-note">
+                        The market is splitting by where memory lives and how
+                        opinionated the memory model is.
+                    </p>
+                </div>
+                <div class="grid cols-2">
+                    <div class="card">
+                        <h3>1. Drop-in memory APIs</h3>
+                        <p>
+                            Mem0, RetainDB, Honcho, Supermemory. These sell
+                            quick setup, SDKs, dashboards, and production
+                            readiness.
+                        </p>
+                        <div class="pill-row">
+                            <span class="pill api">API-led</span
+                            ><span class="pill enterprise"
+                                >PLG → enterprise</span
+                            >
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>2. Local-first coding memory</h3>
+                        <p>
+                            ByteRover, Hindsight local, Holographic, OpenViking,
+                            YantrikDB. These win trust by staying inspectable,
+                            portable, or offline.
+                        </p>
+                        <div class="pill-row">
+                            <span class="pill local">Local-first</span
+                            ><span class="pill hot">OpenClaw/Hermes wedge</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>3. Graph and temporal memory</h3>
+                        <p>
+                            Zep/Graphiti, Cognee, Hindsight, YantrikDB,
+                            Supermemory graph. These sell chronology,
+                            provenance, changing facts, and contradiction
+                            handling.
+                        </p>
+                        <div class="pill-row">
+                            <span class="pill">Temporal</span
+                            ><span class="pill">Provenance</span
+                            ><span class="pill">Graph</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>4. Stateful-agent runtimes</h3>
+                        <p>
+                            Letta is the clearest example. It does not sell
+                            memory as a plugin; it sells a world where agents
+                            are natively persistent.
+                        </p>
+                        <div class="pill-row">
+                            <span class="pill">Runtime</span
+                            ><span class="pill enterprise">Platform sale</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="vendors">
+                <div class="section-head">
+                    <div>
+                        <div class="section-kicker">
+                            Interactive vendor deck
+                        </div>
+                        <h2>Who sells what, to whom, and when?</h2>
+                    </div>
+                    <p class="section-note">
+                        Use the filters to isolate the adoption surface. “A”
+                        means individual OpenClaw/Hermes power users; “B” means
+                        developers building agents; “C” means
+                        enterprise/internal-agent buyers.
+                    </p>
+                </div>
+
+                <div class="vendor-controls">
+                    <button class="filter active" data-filter="all">All</button>
+                    <button class="filter" data-filter="A">
+                        A · Power users
+                    </button>
+                    <button class="filter" data-filter="B">
+                        B · Dev builders
+                    </button>
+                    <button class="filter" data-filter="C">
+                        C · Enterprise
+                    </button>
+                    <button class="filter" data-filter="local">
+                        Local-first
+                    </button>
+                    <button class="filter" data-filter="api">
+                        API/platform
+                    </button>
+                    <button class="filter" data-filter="graph">
+                        Graph/temporal
+                    </button>
+                </div>
+
+                <div class="vendor-grid" id="vendorGrid">
+                    <article class="vendor-card" data-tags="A B C api graph">
+                        <div class="category">Context cloud</div>
+                        <h3>Supermemory</h3>
+                        <p>
+                            Broadest OpenClaw/Hermes-adjacent stack: memory,
+                            RAG, profiles, connectors, extractors, graph, files,
+                            and personal app.
+                        </p>
+                        <div class="pill-row">
+                            <span class="pill hot">B first</span
+                            ><span class="pill enterprise">C upside</span
+                            ><span class="pill">A funnel</span>
+                        </div>
+                        <details>
+                            <summary>Journey</summary>
+                            <ul class="mini-list">
+                                <li>
+                                    Consumer/user starts with second-brain or
+                                    AI-tool context.
+                                </li>
+                                <li>
+                                    Developer sees the API as a shortcut to
+                                    profiles + RAG + connectors.
+                                </li>
+                                <li>
+                                    Enterprise asks for self-hosted, air-gapped,
+                                    scale, or governance.
+                                </li>
+                            </ul>
+                        </details>
+                    </article>
+
+                    <article class="vendor-card" data-tags="A B C api">
+                        <div class="category">Memory API</div>
+                        <h3>Mem0</h3>
+                        <p>
+                            Default drop-in memory API motion: SDKs, OSS,
+                            integrations, cloud, and broad agent-app
+                            positioning.
+                        </p>
+                        <div class="pill-row">
+                            <span class="pill hot">B/C</span
+                            ><span class="pill api">SDK-led</span>
+                        </div>
+                        <details>
+                            <summary>Journey</summary>
+                            <ul class="mini-list">
+                                <li>
+                                    Builder tires of resending context or paying
+                                    token tax.
+                                </li>
+                                <li>Installs plugin/SDK.</li>
+                                <li>Scales into production personalization.</li>
+                            </ul>
+                        </details>
+                    </article>
+
+                    <article class="vendor-card" data-tags="A B C api graph">
+                        <div class="category">User / peer modeling</div>
+                        <h3>Honcho</h3>
+                        <p>
+                            Less “retrieve facts,” more “model users, agents,
+                            groups, projects, and ideas as they evolve.”
+                        </p>
+                        <div class="pill-row">
+                            <span class="pill">State model</span
+                            ><span class="pill hot">B/C</span>
+                        </div>
+                        <details>
+                            <summary>Journey</summary>
+                            <ul class="mini-list">
+                                <li>
+                                    Agent feels generic despite stored notes.
+                                </li>
+                                <li>
+                                    Team wants richer user or project state.
+                                </li>
+                                <li>Managed service enters after prototype.</li>
+                            </ul>
+                        </details>
+                    </article>
+
+                    <article class="vendor-card" data-tags="A B local graph">
+                        <div class="category">Coding-agent memory</div>
+                        <h3>ByteRover</h3>
+                        <p>
+                            Local-first, hierarchical coding-agent memory;
+                            strong fit for OpenClaw/Hermes users who want
+                            project continuity.
+                        </p>
+                        <div class="pill-row">
+                            <span class="pill hot">A → B</span
+                            ><span class="pill local">Local-first</span>
+                        </div>
+                        <details>
+                            <summary>Journey</summary>
+                            <ul class="mini-list">
+                                <li>
+                                    Agent loses repo decisions after compaction.
+                                </li>
+                                <li>Solo dev installs CLI/plugin.</li>
+                                <li>
+                                    Cloud sync monetizes teams and multi-machine
+                                    use.
+                                </li>
+                            </ul>
+                        </details>
+                    </article>
+
+                    <article class="vendor-card" data-tags="A B C local graph">
+                        <div class="category">Automatic recall</div>
+                        <h3>Hindsight</h3>
+                        <p>
+                            Sharp OpenClaw/Hermes wedge: built-in memory fails
+                            when the model forgets to save or search. Hindsight
+                            automates both.
+                        </p>
+                        <div class="pill-row">
+                            <span class="pill local">Local option</span
+                            ><span class="pill">Cloud path</span>
+                        </div>
+                        <details>
+                            <summary>Journey</summary>
+                            <ul class="mini-list">
+                                <li>User has already tried naive memory.</li>
+                                <li>
+                                    Wants pre-response recall without manual
+                                    tool-calling.
+                                </li>
+                                <li>Paid path likely cloud/team/production.</li>
+                            </ul>
+                        </details>
+                    </article>
+
+                    <article class="vendor-card" data-tags="A local">
+                        <div class="category">Hermes local option</div>
+                        <h3>Holographic</h3>
+                        <p>
+                            SQLite/FTS5 local Hermes provider. Great for
+                            offline, zero-account adoption; no clear standalone
+                            commercial motion.
+                        </p>
+                        <div class="pill-row">
+                            <span class="pill hot">A</span
+                            ><span class="pill local">Free/offline</span>
+                        </div>
+                        <details>
+                            <summary>Journey</summary>
+                            <ul class="mini-list">
+                                <li>User runs Hermes setup.</li>
+                                <li>Chooses no-account, no-cloud memory.</li>
+                                <li>
+                                    May later migrate if quality or scale
+                                    disappoints.
+                                </li>
+                            </ul>
+                        </details>
+                    </article>
+
+                    <article class="vendor-card" data-tags="A B C local graph">
+                        <div class="category">Context database</div>
+                        <h3>OpenViking</h3>
+                        <p>
+                            OSS filesystem-style context database: memories,
+                            resources, and skills as a hierarchical context
+                            substrate.
+                        </p>
+                        <div class="pill-row">
+                            <span class="pill local">Self-host</span
+                            ><span class="pill">Infra-minded</span>
+                        </div>
+                        <details>
+                            <summary>Journey</summary>
+                            <ul class="mini-list">
+                                <li>
+                                    Engineer outgrows flat vector/RAG memory.
+                                </li>
+                                <li>Wants hierarchy and self-hosting.</li>
+                                <li>
+                                    Commercial path appears unclear or indirect.
+                                </li>
+                            </ul>
+                        </details>
+                    </article>
+
+                    <article class="vendor-card" data-tags="A B local graph">
+                        <div class="category">Cognitive memory DB</div>
+                        <h3>YantrikDB</h3>
+                        <p>
+                            Temporal decay, consolidation, contradiction
+                            detection, graph memory, and MCP. Hacker/OSS-first
+                            profile.
+                        </p>
+                        <div class="pill-row">
+                            <span class="pill">Contradictions</span
+                            ><span class="pill local">MCP/local</span>
+                        </div>
+                        <details>
+                            <summary>Journey</summary>
+                            <ul class="mini-list">
+                                <li>Builder sees stale-memory problem.</li>
+                                <li>Tries MCP/server/library.</li>
+                                <li>
+                                    Revenue path likely
+                                    hosted/support/enterprise if it matures.
+                                </li>
+                            </ul>
+                        </details>
+                    </article>
+
+                    <article class="vendor-card" data-tags="B C api">
+                        <div class="category">Production memory API</div>
+                        <h3>RetainDB</h3>
+                        <p>
+                            Explicit “AI agents forget” SaaS/API motion for
+                            teams building products, sessions, handoffs, and
+                            persistent memory.
+                        </p>
+                        <div class="pill-row">
+                            <span class="pill hot">B</span
+                            ><span class="pill enterprise">C next</span>
+                        </div>
+                        <details>
+                            <summary>Journey</summary>
+                            <ul class="mini-list">
+                                <li>
+                                    App needs users, sessions, decisions, and
+                                    tool results remembered.
+                                </li>
+                                <li>Team uses wizard/SDK/MCP.</li>
+                                <li>
+                                    Enterprise buys dedicated infra, SSO, SLA.
+                                </li>
+                            </ul>
+                        </details>
+                    </article>
+
+                    <article class="vendor-card" data-tags="A B C api">
+                        <div class="category">Stateful agents</div>
+                        <h3>Letta</h3>
+                        <p>
+                            Sells the stateful-agent architecture. Memory is not
+                            a bolt-on; persistence is the agent’s spine.
+                        </p>
+                        <div class="pill-row">
+                            <span class="pill hot">B/C</span
+                            ><span class="pill">Runtime</span>
+                        </div>
+                        <details>
+                            <summary>Journey</summary>
+                            <ul class="mini-list">
+                                <li>
+                                    Developer decides plugin memory is not
+                                    enough.
+                                </li>
+                                <li>Tries Letta Code or API.</li>
+                                <li>Builds on a persistent-agent platform.</li>
+                            </ul>
+                        </details>
+                    </article>
+
+                    <article class="vendor-card" data-tags="B C graph api">
+                        <div class="category">Temporal graph memory</div>
+                        <h3>Zep / Graphiti</h3>
+                        <p>
+                            Production context graph for changing facts,
+                            business data, documents, chronology, and enterprise
+                            memory.
+                        </p>
+                        <div class="pill-row">
+                            <span class="pill hot">C</span
+                            ><span class="pill">B wedge</span
+                            ><span class="pill enterprise">Enterprise</span>
+                        </div>
+                        <details>
+                            <summary>Journey</summary>
+                            <ul class="mini-list">
+                                <li>Static RAG fails on changing facts.</li>
+                                <li>Team prototypes Graphiti or Zep.</li>
+                                <li>
+                                    Enterprise buys governance, scale, and SLA.
+                                </li>
+                            </ul>
+                        </details>
+                    </article>
+
+                    <article
+                        class="vendor-card"
+                        data-tags="A B C graph api local"
+                    >
+                        <div class="category">Graph memory control plane</div>
+                        <h3>Cognee</h3>
+                        <p>
+                            Capture docs, warehouses, APIs, chat logs, tickets;
+                            model into graph memory; recall across tools with
+                            provenance.
+                        </p>
+                        <div class="pill-row">
+                            <span class="pill hot">B/C</span
+                            ><span class="pill">OSS wedge</span>
+                        </div>
+                        <details>
+                            <summary>Journey</summary>
+                            <ul class="mini-list">
+                                <li>Engineer installs locally.</li>
+                                <li>Ingests docs/code/tickets.</li>
+                                <li>
+                                    Moves to cloud/on-prem for teams and
+                                    governance.
+                                </li>
+                            </ul>
+                        </details>
+                    </article>
+                </div>
+            </section>
+
+            <section id="journeys">
+                <div class="section-head">
+                    <div>
+                        <div class="section-kicker">Demand creation</div>
+                        <h2>How customers come to believe memory matters.</h2>
+                    </div>
+                    <p class="section-note">
+                        The agent creates the pain; the memory vendor captures
+                        the moment of recognition.
+                    </p>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab active" data-tab="journeyA">
+                        A · Single power user
+                    </button>
+                    <button class="tab" data-tab="journeyB">
+                        B · Agent developer
+                    </button>
+                    <button class="tab" data-tab="journeyC">
+                        C · Enterprise team
+                    </button>
+                </div>
+
+                <div id="journeyA" class="tab-panel active">
+                    <div class="journey">
+                        <div class="step">
+                            <div class="num">1</div>
+                            <h3>Installs OpenClaw/Hermes</h3>
+                            <p>
+                                The agent becomes useful enough to run
+                                repeatedly.
+                            </p>
+                        </div>
+                        <div class="step">
+                            <div class="num">2</div>
+                            <h3>Feels amnesia</h3>
+                            <p>
+                                Preferences, projects, people, and unresolved
+                                tasks vanish between sessions.
+                            </p>
+                        </div>
+                        <div class="step">
+                            <div class="num">3</div>
+                            <h3>Runs setup/searches plugin</h3>
+                            <p>
+                                Hermes provider picker, OpenClaw docs, GitHub,
+                                Discord, MCP directories.
+                            </p>
+                        </div>
+                        <div class="step">
+                            <div class="num">4</div>
+                            <h3>Chooses low-friction path</h3>
+                            <p>Usually free, local, or fast API-key setup.</p>
+                        </div>
+                        <div class="step">
+                            <div class="num">5</div>
+                            <h3>Sticks if recall feels magical</h3>
+                            <p>
+                                Monetization requires sync, higher limits,
+                                multi-agent use, or personal plan.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="journeyB" class="tab-panel">
+                    <div class="journey">
+                        <div class="step">
+                            <div class="num">1</div>
+                            <h3>Prototype breaks</h3>
+                            <p>
+                                Raw chat history, vector search, or prompt
+                                stuffing fails.
+                            </p>
+                        </div>
+                        <div class="step">
+                            <div class="num">2</div>
+                            <h3>Quantifies pain</h3>
+                            <p>
+                                Token cost, relevance drift, user churn,
+                                repeated onboarding, brittle handoffs.
+                            </p>
+                        </div>
+                        <div class="step">
+                            <div class="num">3</div>
+                            <h3>Tries SDK/API</h3>
+                            <p>
+                                Quickstart, docs, examples, MCP server, GitHub.
+                            </p>
+                        </div>
+                        <div class="step">
+                            <div class="num">4</div>
+                            <h3>Builds into product</h3>
+                            <p>
+                                Profiles, sessions, tool results, docs,
+                                decisions, and preferences become product state.
+                            </p>
+                        </div>
+                        <div class="step">
+                            <div class="num">5</div>
+                            <h3>Pays for scale</h3>
+                            <p>
+                                Usage, dashboard, team features, cloud hosting,
+                                observability, support.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="journeyC" class="tab-panel">
+                    <div class="journey">
+                        <div class="step">
+                            <div class="num">1</div>
+                            <h3>Internal agent pilot</h3>
+                            <p>
+                                One team proves agents can perform meaningful
+                                work.
+                            </p>
+                        </div>
+                        <div class="step">
+                            <div class="num">2</div>
+                            <h3>Governance wall</h3>
+                            <p>
+                                Security, audit, stale facts, provenance, PII,
+                                and compliance become blockers.
+                            </p>
+                        </div>
+                        <div class="step">
+                            <div class="num">3</div>
+                            <h3>Evaluates infra</h3>
+                            <p>
+                                Graph memory, self-hosting, BYOC, SSO, RBAC,
+                                retention, deletion, SLAs.
+                            </p>
+                        </div>
+                        <div class="step">
+                            <div class="num">4</div>
+                            <h3>Runs controlled PoC</h3>
+                            <p>
+                                Often starts from OSS or one integration before
+                                wider rollout.
+                            </p>
+                        </div>
+                        <div class="step">
+                            <div class="num">5</div>
+                            <h3>Buys assurance</h3>
+                            <p>
+                                High-ACV deal: enterprise support, deployment
+                                control, security review, FDE.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="supermemory">
+                <div class="section-head">
+                    <div>
+                        <div class="section-kicker">The outlier</div>
+                        <h2>
+                            Supermemory is closer to Fulcra than the others, but
+                            not the same animal.
+                        </h2>
+                    </div>
+                </div>
+                <div class="supermemory-comparison">
+                    <div class="card quote-card">
+                        <p class="big-quote">
+                            Supermemory does not merely sell “memory.” It sells
+                            a broader context cloud.
+                        </p>
+                        <p>
+                            Its stack spans memory, RAG, profiles, connectors,
+                            extractors, filesystems, and graph-like context.
+                            That gives it two front doors: personal second-brain
+                            users and developers building AI products.
+                        </p>
+                    </div>
+                    <div class="card">
+                        <h3>Fulcra vs. Supermemory</h3>
+                        <table class="matrix">
+                            <tr>
+                                <th>Dimension</th>
+                                <th>Fulcra</th>
+                                <th>Supermemory</th>
+                            </tr>
+                            <tr>
+                                <td><b>Center of gravity</b></td>
+                                <td>Human life context</td>
+                                <td>Agent/app context cloud</td>
+                            </tr>
+                            <tr>
+                                <td><b>Data moat</b></td>
+                                <td>
+                                    Health, location, calendars, wearables,
+                                    annotations, real-world streams
+                                </td>
+                                <td>
+                                    Documents, connectors, memory, profiles,
+                                    RAG, files
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Buyer wedge</b></td>
+                                <td>
+                                    Individual human + Life API / agent access
+                                </td>
+                                <td>Developer API + power-user context</td>
+                            </tr>
+                            <tr>
+                                <td><b>Strategic line</b></td>
+                                <td>
+                                    Permissioned personal data that never
+                                    reaches the public internet
+                                </td>
+                                <td>
+                                    Context substrate for AI tools and products
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="audiences">
+                <div class="section-head">
+                    <div>
+                        <div class="section-kicker">Revenue read</div>
+                        <h2>Adoption surface ≠ revenue surface.</h2>
+                    </div>
+                    <p class="section-note">
+                        OpenClaw/Hermes power users matter because they are
+                        early, vocal, and high-intent. But the strongest revenue
+                        is usually B and C.
+                    </p>
+                </div>
+
+                <table class="matrix">
+                    <thead>
+                        <tr>
+                            <th>Vendor</th>
+                            <th>A · Power users</th>
+                            <th>B · Dev builders</th>
+                            <th>C · Enterprise</th>
+                            <th>Likely revenue driver</th>
+                            <br />
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><b>Supermemory</b></td>
+                            <td><span class="score high">High</span></td>
+                            <td><span class="score high">Very high</span></td>
+                            <td><span class="score high">High</span></td>
+                            <td>B first, C second, A as funnel</td>
+                        </tr>
+                        <tr>
+                            <td><b>Mem0</b></td>
+                            <td><span class="score med">Medium</span></td>
+                            <td><span class="score high">Very high</span></td>
+                            <td><span class="score high">High</span></td>
+                            <td>B/C</td>
+                        </tr>
+                        <tr>
+                            <td><b>Honcho</b></td>
+                            <td><span class="score high">Med-high</span></td>
+                            <td><span class="score high">High</span></td>
+                            <td><span class="score high">High</span></td>
+                            <td>B/C</td>
+                        </tr>
+                        <tr>
+                            <td><b>RetainDB</b></td>
+                            <td><span class="score med">Medium</span></td>
+                            <td><span class="score high">High</span></td>
+                            <td><span class="score high">Med-high</span></td>
+                            <td>B, then C</td>
+                        </tr>
+                        <tr>
+                            <td><b>ByteRover</b></td>
+                            <td><span class="score high">Very high</span></td>
+                            <td><span class="score high">High</span></td>
+                            <td><span class="score med">Medium</span></td>
+                            <td>A → B</td>
+                        </tr>
+                        <tr>
+                            <td><b>Hindsight</b></td>
+                            <td><span class="score high">High</span></td>
+                            <td><span class="score high">Med-high</span></td>
+                            <td><span class="score med">Medium</span></td>
+                            <td>B/C for cloud; A for adoption</td>
+                        </tr>
+                        <tr>
+                            <td><b>Holographic</b></td>
+                            <td><span class="score high">Very high</span></td>
+                            <td><span class="score low">Low</span></td>
+                            <td><span class="score low">Low</span></td>
+                            <td>No obvious vendor revenue</td>
+                        </tr>
+                        <tr>
+                            <td><b>OpenViking</b></td>
+                            <td>
+                                <span class="score high">High technical</span>
+                            </td>
+                            <td><span class="score med">Med-high</span></td>
+                            <td><span class="score med">Medium</span></td>
+                            <td>Unclear / OSS / strategic</td>
+                        </tr>
+                        <tr>
+                            <td><b>YantrikDB</b></td>
+                            <td><span class="score high">Med-high</span></td>
+                            <td><span class="score med">Med-high</span></td>
+                            <td><span class="score low">Low-med</span></td>
+                            <td>Unclear; developer adoption first</td>
+                        </tr>
+                        <tr>
+                            <td><b>Letta</b></td>
+                            <td><span class="score med">Medium</span></td>
+                            <td><span class="score high">Very high</span></td>
+                            <td><span class="score high">High</span></td>
+                            <td>B/C</td>
+                        </tr>
+                        <tr>
+                            <td><b>Zep / Graphiti</b></td>
+                            <td><span class="score low">Low</span></td>
+                            <td><span class="score high">High</span></td>
+                            <td><span class="score high">Very high</span></td>
+                            <td>C, with B as wedge</td>
+                        </tr>
+                        <tr>
+                            <td><b>Cognee</b></td>
+                            <td><span class="score med">Medium</span></td>
+                            <td><span class="score high">High</span></td>
+                            <td><span class="score high">High</span></td>
+                            <td>B/C</td>
+                        </tr>
+                        <tr>
+                            <td><b>Fulcra</b></td>
+                            <td><span class="score high">Very high</span></td>
+                            <td><span class="score med">Medium</span></td>
+                            <td><span class="score med">Medium/niche</span></td>
+                            <td>A today, B expansion path</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="fulcra">
+                <div class="section-head">
+                    <div>
+                        <div class="section-kicker">
+                            Implications for Fulcra
+                        </div>
+                        <h2>
+                            The strategic opening is “context,” not “memory.”
+                        </h2>
+                    </div>
+                </div>
+                <div class="grid cols-3">
+                    <div class="card">
+                        <h3>1. Do not fight on “agent memory” alone.</h3>
+                        <p>
+                            That phrase pulls Fulcra into a crowded field of
+                            SDKs, vector memories, local plugins, and graph
+                            stores. Fulcra’s sharper claim is: agents need the
+                            personal data that will never be written to the
+                            public internet.
+                        </p>
+                    </div>
+                    <div class="card">
+                        <h3>2. Use OpenClaw/Hermes as proof surface.</h3>
+                        <p>
+                            Power users are not necessarily the richest revenue
+                            pool, but they are the fastest way to show the
+                            delta: an agent with Fulcra knows sleep, calendar,
+                            location, biometrics, annotations, and life state.
+                        </p>
+                    </div>
+                    <div class="card">
+                        <h3>3. Position against Supermemory with respect.</h3>
+                        <p>
+                            Supermemory validates the “context layer” category.
+                            The distinction is that Fulcra can become the
+                            permissioned human-data backend: the context that
+                            documents and chats cannot supply.
+                        </p>
+                    </div>
+                </div>
+                <div class="card quote-card" style="margin-top: 18px">
+                    <p class="big-quote">
+                        Memory providers remember what the agent has seen.
+                        Fulcra knows what is happening to the human.
+                    </p>
+                </div>
+            </section>
+
+            <section id="sources">
+                <div class="section-head">
+                    <div>
+                        <div class="section-kicker">Source notes</div>
+                        <h2>Public signals used.</h2>
+                    </div>
+                    <p class="section-note">
+                        Revenue mix is inferred from public positioning,
+                        pricing, product surfaces, and GTM motion. It is not
+                        private funnel data.
+                    </p>
+                </div>
+                <div class="card">
+                    <ol class="source-list">
+                        <li>
+                            <a href="https://docs.openclaw.ai/concepts/memory"
+                                >OpenClaw memory docs</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="https://hermes-agent.nousresearch.com/docs/user-guide/features/memory-providers"
+                                >Hermes memory provider docs</a
+                            >
+                        </li>
+                        <li>
+                            <a href="https://supermemory.ai/"
+                                >Supermemory homepage</a
+                            >
+                        </li>
+                        <li>
+                            <a href="https://supermemory.ai/docs/user-profiles"
+                                >Supermemory user profiles</a
+                            >
+                        </li>
+                        <li>
+                            <a href="https://supermemory.ai/pricing/"
+                                >Supermemory pricing</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="https://github.com/supermemoryai/supermemory"
+                                >Supermemory GitHub</a
+                            >
+                        </li>
+                        <li>
+                            <a href="https://www.fulcradynamics.com/"
+                                >Fulcra Dynamics</a
+                            >
+                        </li>
+                        <li>
+                            <a href="https://www.fulcradynamics.com/pricing/"
+                                >Fulcra pricing</a
+                            >
+                        </li>
+                        <li><a href="https://mem0.ai/">Mem0</a></li>
+                        <li>
+                            <a href="https://docs.mem0.ai/integrations/openclaw"
+                                >Mem0 OpenClaw integration</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="https://honcho.dev/docs/v3/documentation/introduction/overview"
+                                >Honcho docs</a
+                            >
+                        </li>
+                        <li>
+                            <a href="https://www.retaindb.com/">RetainDB</a>
+                        </li>
+                        <li>
+                            <a href="https://www.byterover.dev/">ByteRover</a>
+                        </li>
+                        <li>
+                            <a
+                                href="https://hindsight.vectorize.io/blog/2026/03/06/adding-memory-to-openclaw-with-hindsight"
+                                >Hindsight OpenClaw memory guide</a
+                            >
+                        </li>
+                        <li>
+                            <a href="https://github.com/volcengine/OpenViking/"
+                                >OpenViking GitHub</a
+                            >
+                        </li>
+                        <li><a href="https://yantrikdb.com/">YantrikDB</a></li>
+                        <li>
+                            <a href="https://www.letta.com/blog/letta-code"
+                                >Letta Code</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="https://www.getzep.com/product/agent-memory/"
+                                >Zep agent memory</a
+                            >
+                        </li>
+                        <li><a href="https://www.cognee.ai/">Cognee</a></li>
+                    </ol>
+                </div>
+            </section>
+
+            <footer class="footer">
+                <p>
+                    <strong>Briefing generated for Michael Tiffany.</strong>
+                    Single-page HTML with inline CSS and lightweight inline
+                    JavaScript. Open locally in a browser; print to PDF if
+                    needed.
+                </p>
+            </footer>
         </div>
-      </div>
-      <aside class="hero-card">
-        <h2 style="font-size:32px; margin-bottom:8px;">Executive read</h2>
-        <p style="color:var(--muted); margin-top:0;">OpenClaw and Hermes create high-intent adoption surfaces. The revenue pools sit one level downstream: developer infrastructure first, enterprise governance second.</p>
-        <div class="metric-grid">
-          <div class="metric"><strong>3</strong><span>core audiences: power users, devs, enterprise</span></div>
-          <div class="metric"><strong>5</strong><span>trigger pains: amnesia, compaction, handoff, stale facts, cost</span></div>
-          <div class="metric"><strong>12+</strong><span>providers competing across local, API, graph, and platform layers</span></div>
-          <div class="metric"><strong>1</strong><span>outlier: Supermemory as broader context cloud</span></div>
-        </div>
-      </aside>
-    </header>
 
-    <nav class="toc">
-      <a href="#shape">Market shape</a>
-      <a href="#vendors">Vendor cards</a>
-      <a href="#journeys">Customer journeys</a>
-      <a href="#supermemory">Supermemory vs. others</a>
-      <a href="#audiences">Revenue audiences</a>
-      <a href="#fulcra">Fulcra implications</a>
-      <a href="#sources">Sources</a>
-    </nav>
+        <script>
+            const tabs = document.querySelectorAll(".tab");
+            const panels = document.querySelectorAll(".tab-panel");
+            tabs.forEach((tab) => {
+                tab.addEventListener("click", () => {
+                    tabs.forEach((t) => t.classList.remove("active"));
+                    panels.forEach((p) => p.classList.remove("active"));
+                    tab.classList.add("active");
+                    document
+                        .getElementById(tab.dataset.tab)
+                        .classList.add("active");
+                });
+            });
 
-    <section id="shape">
-      <div class="section-head">
-        <div>
-          <div class="section-kicker">The map</div>
-          <h2>Four categories, one bottleneck.</h2>
-        </div>
-        <p class="section-note">The market is splitting by where memory lives and how opinionated the memory model is.</p>
-      </div>
-      <div class="grid cols-2">
-        <div class="card">
-          <h3>1. Drop-in memory APIs</h3>
-          <p>Mem0, RetainDB, Honcho, Supermemory. These sell quick setup, SDKs, dashboards, and production readiness.</p>
-          <div class="pill-row"><span class="pill api">API-led</span><span class="pill enterprise">PLG → enterprise</span></div>
-        </div>
-        <div class="card">
-          <h3>2. Local-first coding memory</h3>
-          <p>ByteRover, Hindsight local, Holographic, OpenViking, YantrikDB. These win trust by staying inspectable, portable, or offline.</p>
-          <div class="pill-row"><span class="pill local">Local-first</span><span class="pill hot">OpenClaw/Hermes wedge</span></div>
-        </div>
-        <div class="card">
-          <h3>3. Graph and temporal memory</h3>
-          <p>Zep/Graphiti, Cognee, Hindsight, YantrikDB, Supermemory graph. These sell chronology, provenance, changing facts, and contradiction handling.</p>
-          <div class="pill-row"><span class="pill">Temporal</span><span class="pill">Provenance</span><span class="pill">Graph</span></div>
-        </div>
-        <div class="card">
-          <h3>4. Stateful-agent runtimes</h3>
-          <p>Letta is the clearest example. It does not sell memory as a plugin; it sells a world where agents are natively persistent.</p>
-          <div class="pill-row"><span class="pill">Runtime</span><span class="pill enterprise">Platform sale</span></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="vendors">
-      <div class="section-head">
-        <div>
-          <div class="section-kicker">Interactive vendor deck</div>
-          <h2>Who sells what, to whom, and when?</h2>
-        </div>
-        <p class="section-note">Use the filters to isolate the adoption surface. “A” means individual OpenClaw/Hermes power users; “B” means developers building agents; “C” means enterprise/internal-agent buyers.</p>
-      </div>
-
-      <div class="vendor-controls">
-        <button class="filter active" data-filter="all">All</button>
-        <button class="filter" data-filter="A">A · Power users</button>
-        <button class="filter" data-filter="B">B · Dev builders</button>
-        <button class="filter" data-filter="C">C · Enterprise</button>
-        <button class="filter" data-filter="local">Local-first</button>
-        <button class="filter" data-filter="api">API/platform</button>
-        <button class="filter" data-filter="graph">Graph/temporal</button>
-      </div>
-
-      <div class="vendor-grid" id="vendorGrid">
-        <article class="vendor-card" data-tags="A B C api graph">
-          <div class="category">Context cloud</div>
-          <h3>Supermemory</h3>
-          <p>Broadest OpenClaw/Hermes-adjacent stack: memory, RAG, profiles, connectors, extractors, graph, files, and personal app.</p>
-          <div class="pill-row"><span class="pill hot">B first</span><span class="pill enterprise">C upside</span><span class="pill">A funnel</span></div>
-          <details><summary>Journey</summary><ul class="mini-list"><li>Consumer/user starts with second-brain or AI-tool context.</li><li>Developer sees the API as a shortcut to profiles + RAG + connectors.</li><li>Enterprise asks for self-hosted, air-gapped, scale, or governance.</li></ul></details>
-        </article>
-
-        <article class="vendor-card" data-tags="A B C api">
-          <div class="category">Memory API</div>
-          <h3>Mem0</h3>
-          <p>Default drop-in memory API motion: SDKs, OSS, integrations, cloud, and broad agent-app positioning.</p>
-          <div class="pill-row"><span class="pill hot">B/C</span><span class="pill api">SDK-led</span></div>
-          <details><summary>Journey</summary><ul class="mini-list"><li>Builder tires of resending context or paying token tax.</li><li>Installs plugin/SDK.</li><li>Scales into production personalization.</li></ul></details>
-        </article>
-
-        <article class="vendor-card" data-tags="A B C api graph">
-          <div class="category">User / peer modeling</div>
-          <h3>Honcho</h3>
-          <p>Less “retrieve facts,” more “model users, agents, groups, projects, and ideas as they evolve.”</p>
-          <div class="pill-row"><span class="pill">State model</span><span class="pill hot">B/C</span></div>
-          <details><summary>Journey</summary><ul class="mini-list"><li>Agent feels generic despite stored notes.</li><li>Team wants richer user or project state.</li><li>Managed service enters after prototype.</li></ul></details>
-        </article>
-
-        <article class="vendor-card" data-tags="A B local graph">
-          <div class="category">Coding-agent memory</div>
-          <h3>ByteRover</h3>
-          <p>Local-first, hierarchical coding-agent memory; strong fit for OpenClaw/Hermes users who want project continuity.</p>
-          <div class="pill-row"><span class="pill hot">A → B</span><span class="pill local">Local-first</span></div>
-          <details><summary>Journey</summary><ul class="mini-list"><li>Agent loses repo decisions after compaction.</li><li>Solo dev installs CLI/plugin.</li><li>Cloud sync monetizes teams and multi-machine use.</li></ul></details>
-        </article>
-
-        <article class="vendor-card" data-tags="A B C local graph">
-          <div class="category">Automatic recall</div>
-          <h3>Hindsight</h3>
-          <p>Sharp OpenClaw/Hermes wedge: built-in memory fails when the model forgets to save or search. Hindsight automates both.</p>
-          <div class="pill-row"><span class="pill local">Local option</span><span class="pill">Cloud path</span></div>
-          <details><summary>Journey</summary><ul class="mini-list"><li>User has already tried naive memory.</li><li>Wants pre-response recall without manual tool-calling.</li><li>Paid path likely cloud/team/production.</li></ul></details>
-        </article>
-
-        <article class="vendor-card" data-tags="A local">
-          <div class="category">Hermes local option</div>
-          <h3>Holographic</h3>
-          <p>SQLite/FTS5 local Hermes provider. Great for offline, zero-account adoption; no clear standalone commercial motion.</p>
-          <div class="pill-row"><span class="pill hot">A</span><span class="pill local">Free/offline</span></div>
-          <details><summary>Journey</summary><ul class="mini-list"><li>User runs Hermes setup.</li><li>Chooses no-account, no-cloud memory.</li><li>May later migrate if quality or scale disappoints.</li></ul></details>
-        </article>
-
-        <article class="vendor-card" data-tags="A B C local graph">
-          <div class="category">Context database</div>
-          <h3>OpenViking</h3>
-          <p>OSS filesystem-style context database: memories, resources, and skills as a hierarchical context substrate.</p>
-          <div class="pill-row"><span class="pill local">Self-host</span><span class="pill">Infra-minded</span></div>
-          <details><summary>Journey</summary><ul class="mini-list"><li>Engineer outgrows flat vector/RAG memory.</li><li>Wants hierarchy and self-hosting.</li><li>Commercial path appears unclear or indirect.</li></ul></details>
-        </article>
-
-        <article class="vendor-card" data-tags="A B local graph">
-          <div class="category">Cognitive memory DB</div>
-          <h3>YantrikDB</h3>
-          <p>Temporal decay, consolidation, contradiction detection, graph memory, and MCP. Hacker/OSS-first profile.</p>
-          <div class="pill-row"><span class="pill">Contradictions</span><span class="pill local">MCP/local</span></div>
-          <details><summary>Journey</summary><ul class="mini-list"><li>Builder sees stale-memory problem.</li><li>Tries MCP/server/library.</li><li>Revenue path likely hosted/support/enterprise if it matures.</li></ul></details>
-        </article>
-
-        <article class="vendor-card" data-tags="B C api">
-          <div class="category">Production memory API</div>
-          <h3>RetainDB</h3>
-          <p>Explicit “AI agents forget” SaaS/API motion for teams building products, sessions, handoffs, and persistent memory.</p>
-          <div class="pill-row"><span class="pill hot">B</span><span class="pill enterprise">C next</span></div>
-          <details><summary>Journey</summary><ul class="mini-list"><li>App needs users, sessions, decisions, and tool results remembered.</li><li>Team uses wizard/SDK/MCP.</li><li>Enterprise buys dedicated infra, SSO, SLA.</li></ul></details>
-        </article>
-
-        <article class="vendor-card" data-tags="A B C api">
-          <div class="category">Stateful agents</div>
-          <h3>Letta</h3>
-          <p>Sells the stateful-agent architecture. Memory is not a bolt-on; persistence is the agent’s spine.</p>
-          <div class="pill-row"><span class="pill hot">B/C</span><span class="pill">Runtime</span></div>
-          <details><summary>Journey</summary><ul class="mini-list"><li>Developer decides plugin memory is not enough.</li><li>Tries Letta Code or API.</li><li>Builds on a persistent-agent platform.</li></ul></details>
-        </article>
-
-        <article class="vendor-card" data-tags="B C graph api">
-          <div class="category">Temporal graph memory</div>
-          <h3>Zep / Graphiti</h3>
-          <p>Production context graph for changing facts, business data, documents, chronology, and enterprise memory.</p>
-          <div class="pill-row"><span class="pill hot">C</span><span class="pill">B wedge</span><span class="pill enterprise">Enterprise</span></div>
-          <details><summary>Journey</summary><ul class="mini-list"><li>Static RAG fails on changing facts.</li><li>Team prototypes Graphiti or Zep.</li><li>Enterprise buys governance, scale, and SLA.</li></ul></details>
-        </article>
-
-        <article class="vendor-card" data-tags="A B C graph api local">
-          <div class="category">Graph memory control plane</div>
-          <h3>Cognee</h3>
-          <p>Capture docs, warehouses, APIs, chat logs, tickets; model into graph memory; recall across tools with provenance.</p>
-          <div class="pill-row"><span class="pill hot">B/C</span><span class="pill">OSS wedge</span></div>
-          <details><summary>Journey</summary><ul class="mini-list"><li>Engineer installs locally.</li><li>Ingests docs/code/tickets.</li><li>Moves to cloud/on-prem for teams and governance.</li></ul></details>
-        </article>
-      </div>
-    </section>
-
-    <section id="journeys">
-      <div class="section-head">
-        <div>
-          <div class="section-kicker">Demand creation</div>
-          <h2>How customers come to believe memory matters.</h2>
-        </div>
-        <p class="section-note">The agent creates the pain; the memory vendor captures the moment of recognition.</p>
-      </div>
-
-      <div class="tabs">
-        <button class="tab active" data-tab="journeyA">A · Single power user</button>
-        <button class="tab" data-tab="journeyB">B · Agent developer</button>
-        <button class="tab" data-tab="journeyC">C · Enterprise team</button>
-      </div>
-
-      <div id="journeyA" class="tab-panel active">
-        <div class="journey">
-          <div class="step"><div class="num">1</div><h3>Installs OpenClaw/Hermes</h3><p>The agent becomes useful enough to run repeatedly.</p></div>
-          <div class="step"><div class="num">2</div><h3>Feels amnesia</h3><p>Preferences, projects, people, and unresolved tasks vanish between sessions.</p></div>
-          <div class="step"><div class="num">3</div><h3>Runs setup/searches plugin</h3><p>Hermes provider picker, OpenClaw docs, GitHub, Discord, MCP directories.</p></div>
-          <div class="step"><div class="num">4</div><h3>Chooses low-friction path</h3><p>Usually free, local, or fast API-key setup.</p></div>
-          <div class="step"><div class="num">5</div><h3>Sticks if recall feels magical</h3><p>Monetization requires sync, higher limits, multi-agent use, or personal plan.</p></div>
-        </div>
-      </div>
-
-      <div id="journeyB" class="tab-panel">
-        <div class="journey">
-          <div class="step"><div class="num">1</div><h3>Prototype breaks</h3><p>Raw chat history, vector search, or prompt stuffing fails.</p></div>
-          <div class="step"><div class="num">2</div><h3>Quantifies pain</h3><p>Token cost, relevance drift, user churn, repeated onboarding, brittle handoffs.</p></div>
-          <div class="step"><div class="num">3</div><h3>Tries SDK/API</h3><p>Quickstart, docs, examples, MCP server, GitHub.</p></div>
-          <div class="step"><div class="num">4</div><h3>Builds into product</h3><p>Profiles, sessions, tool results, docs, decisions, and preferences become product state.</p></div>
-          <div class="step"><div class="num">5</div><h3>Pays for scale</h3><p>Usage, dashboard, team features, cloud hosting, observability, support.</p></div>
-        </div>
-      </div>
-
-      <div id="journeyC" class="tab-panel">
-        <div class="journey">
-          <div class="step"><div class="num">1</div><h3>Internal agent pilot</h3><p>One team proves agents can perform meaningful work.</p></div>
-          <div class="step"><div class="num">2</div><h3>Governance wall</h3><p>Security, audit, stale facts, provenance, PII, and compliance become blockers.</p></div>
-          <div class="step"><div class="num">3</div><h3>Evaluates infra</h3><p>Graph memory, self-hosting, BYOC, SSO, RBAC, retention, deletion, SLAs.</p></div>
-          <div class="step"><div class="num">4</div><h3>Runs controlled PoC</h3><p>Often starts from OSS or one integration before wider rollout.</p></div>
-          <div class="step"><div class="num">5</div><h3>Buys assurance</h3><p>High-ACV deal: enterprise support, deployment control, security review, FDE.</p></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="supermemory">
-      <div class="section-head">
-        <div>
-          <div class="section-kicker">The outlier</div>
-          <h2>Supermemory is closer to Fulcra than the others, but not the same animal.</h2>
-        </div>
-      </div>
-      <div class="supermemory-comparison">
-        <div class="card quote-card">
-          <p class="big-quote">Supermemory does not merely sell “memory.” It sells a broader context cloud.</p>
-          <p>Its stack spans memory, RAG, profiles, connectors, extractors, filesystems, and graph-like context. That gives it two front doors: personal second-brain users and developers building AI products.</p>
-        </div>
-        <div class="card">
-          <h3>Fulcra vs. Supermemory</h3>
-          <table class="matrix">
-            <tr><th>Dimension</th><th>Fulcra</th><th>Supermemory</th></tr>
-            <tr><td><b>Center of gravity</b></td><td>Human life context</td><td>Agent/app context cloud</td></tr>
-            <tr><td><b>Data moat</b></td><td>Health, location, calendars, wearables, annotations, real-world streams</td><td>Documents, connectors, memory, profiles, RAG, files</td></tr>
-            <tr><td><b>Buyer wedge</b></td><td>Individual human + Life API / agent access</td><td>Developer API + power-user context</td></tr>
-            <tr><td><b>Strategic line</b></td><td>Permissioned personal data that never reaches the public internet</td><td>Context substrate for AI tools and products</td></tr>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <section id="audiences">
-      <div class="section-head">
-        <div>
-          <div class="section-kicker">Revenue read</div>
-          <h2>Adoption surface ≠ revenue surface.</h2>
-        </div>
-        <p class="section-note">OpenClaw/Hermes power users matter because they are early, vocal, and high-intent. But the strongest revenue is usually B and C.</p>
-      </div>
-
-      <table class="matrix">
-        <thead>
-          <tr>
-            <th>Vendor</th>
-            <th>A · Power users</th>
-            <th>B · Dev builders</th>
-            <th>C · Enterprise</th>
-            <th>Likely revenue driver</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td><b>Supermemory</b></td><td><span class="score high">High</span></td><td><span class="score high">Very high</span></td><td><span class="score high">High</span></td><td>B first, C second, A as funnel</td></tr>
-          <tr><td><b>Mem0</b></td><td><span class="score med">Medium</span></td><td><span class="score high">Very high</span></td><td><span class="score high">High</span></td><td>B/C</td></tr>
-          <tr><td><b>Honcho</b></td><td><span class="score high">Med-high</span></td><td><span class="score high">High</span></td><td><span class="score high">High</span></td><td>B/C</td></tr>
-          <tr><td><b>RetainDB</b></td><td><span class="score med">Medium</span></td><td><span class="score high">High</span></td><td><span class="score high">Med-high</span></td><td>B, then C</td></tr>
-          <tr><td><b>ByteRover</b></td><td><span class="score high">Very high</span></td><td><span class="score high">High</span></td><td><span class="score med">Medium</span></td><td>A → B</td></tr>
-          <tr><td><b>Hindsight</b></td><td><span class="score high">High</span></td><td><span class="score high">Med-high</span></td><td><span class="score med">Medium</span></td><td>B/C for cloud; A for adoption</td></tr>
-          <tr><td><b>Holographic</b></td><td><span class="score high">Very high</span></td><td><span class="score low">Low</span></td><td><span class="score low">Low</span></td><td>No obvious vendor revenue</td></tr>
-          <tr><td><b>OpenViking</b></td><td><span class="score high">High technical</span></td><td><span class="score med">Med-high</span></td><td><span class="score med">Medium</span></td><td>Unclear / OSS / strategic</td></tr>
-          <tr><td><b>YantrikDB</b></td><td><span class="score high">Med-high</span></td><td><span class="score med">Med-high</span></td><td><span class="score low">Low-med</span></td><td>Unclear; developer adoption first</td></tr>
-          <tr><td><b>Letta</b></td><td><span class="score med">Medium</span></td><td><span class="score high">Very high</span></td><td><span class="score high">High</span></td><td>B/C</td></tr>
-          <tr><td><b>Zep / Graphiti</b></td><td><span class="score low">Low</span></td><td><span class="score high">High</span></td><td><span class="score high">Very high</span></td><td>C, with B as wedge</td></tr>
-          <tr><td><b>Cognee</b></td><td><span class="score med">Medium</span></td><td><span class="score high">High</span></td><td><span class="score high">High</span></td><td>B/C</td></tr>
-          <tr><td><b>Fulcra</b></td><td><span class="score high">Very high</span></td><td><span class="score med">Medium</span></td><td><span class="score med">Medium/niche</span></td><td>A today, B expansion path</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section id="fulcra">
-      <div class="section-head">
-        <div>
-          <div class="section-kicker">Implications for Fulcra</div>
-          <h2>The strategic opening is “context,” not “memory.”</h2>
-        </div>
-      </div>
-      <div class="grid cols-3">
-        <div class="card">
-          <h3>1. Do not fight on “agent memory” alone.</h3>
-          <p>That phrase pulls Fulcra into a crowded field of SDKs, vector memories, local plugins, and graph stores. Fulcra’s sharper claim is: agents need the personal data that will never be written to the public internet.</p>
-        </div>
-        <div class="card">
-          <h3>2. Use OpenClaw/Hermes as proof surface.</h3>
-          <p>Power users are not necessarily the richest revenue pool, but they are the fastest way to show the delta: an agent with Fulcra knows sleep, calendar, location, biometrics, annotations, and life state.</p>
-        </div>
-        <div class="card">
-          <h3>3. Position against Supermemory with respect.</h3>
-          <p>Supermemory validates the “context layer” category. The distinction is that Fulcra can become the permissioned human-data backend: the context that documents and chats cannot supply.</p>
-        </div>
-      </div>
-      <div class="card quote-card" style="margin-top:18px;">
-        <p class="big-quote">Memory providers remember what the agent has seen. Fulcra knows what is happening to the human.</p>
-      </div>
-    </section>
-
-    <section id="sources">
-      <div class="section-head">
-        <div>
-          <div class="section-kicker">Source notes</div>
-          <h2>Public signals used.</h2>
-        </div>
-        <p class="section-note">Revenue mix is inferred from public positioning, pricing, product surfaces, and GTM motion. It is not private funnel data.</p>
-      </div>
-      <div class="card">
-        <ol class="source-list">
-          <li><a href="https://docs.openclaw.ai/concepts/memory">OpenClaw memory docs</a></li>
-          <li><a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/memory-providers">Hermes memory provider docs</a></li>
-          <li><a href="https://supermemory.ai/">Supermemory homepage</a></li>
-          <li><a href="https://supermemory.ai/docs/user-profiles">Supermemory user profiles</a></li>
-          <li><a href="https://supermemory.ai/pricing/">Supermemory pricing</a></li>
-          <li><a href="https://github.com/supermemoryai/supermemory">Supermemory GitHub</a></li>
-          <li><a href="https://www.fulcradynamics.com/">Fulcra Dynamics</a></li>
-          <li><a href="https://www.fulcradynamics.com/pricing/">Fulcra pricing</a></li>
-          <li><a href="https://mem0.ai/">Mem0</a></li>
-          <li><a href="https://docs.mem0.ai/integrations/openclaw">Mem0 OpenClaw integration</a></li>
-          <li><a href="https://honcho.dev/docs/v3/documentation/introduction/overview">Honcho docs</a></li>
-          <li><a href="https://www.retaindb.com/">RetainDB</a></li>
-          <li><a href="https://www.byterover.dev/">ByteRover</a></li>
-          <li><a href="https://hindsight.vectorize.io/blog/2026/03/06/adding-memory-to-openclaw-with-hindsight">Hindsight OpenClaw memory guide</a></li>
-          <li><a href="https://github.com/volcengine/OpenViking/">OpenViking GitHub</a></li>
-          <li><a href="https://yantrikdb.com/">YantrikDB</a></li>
-          <li><a href="https://www.letta.com/blog/letta-code">Letta Code</a></li>
-          <li><a href="https://www.getzep.com/product/agent-memory/">Zep agent memory</a></li>
-          <li><a href="https://www.cognee.ai/">Cognee</a></li>
-        </ol>
-      </div>
-    </section>
-
-    <footer class="footer">
-      <p><strong>Briefing generated for Michael Tiffany.</strong> Single-page HTML with inline CSS and lightweight inline JavaScript. Open locally in a browser; print to PDF if needed.</p>
-    </footer>
-  </div>
-
-  <script>
-    const tabs = document.querySelectorAll('.tab');
-    const panels = document.querySelectorAll('.tab-panel');
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
-        panels.forEach(p => p.classList.remove('active'));
-        tab.classList.add('active');
-        document.getElementById(tab.dataset.tab).classList.add('active');
-      });
-    });
-
-    const filters = document.querySelectorAll('.filter');
-    const cards = document.querySelectorAll('.vendor-card');
-    filters.forEach(filter => {
-      filter.addEventListener('click', () => {
-        filters.forEach(f => f.classList.remove('active'));
-        filter.classList.add('active');
-        const tag = filter.dataset.filter;
-        cards.forEach(card => {
-          if (tag === 'all' || card.dataset.tags.split(' ').includes(tag)) {
-            card.classList.remove('hidden');
-          } else {
-            card.classList.add('hidden');
-          }
-        });
-      });
-    });
-  </script>
-</body>
+            const filters = document.querySelectorAll(".filter");
+            const cards = document.querySelectorAll(".vendor-card");
+            filters.forEach((filter) => {
+                filter.addEventListener("click", () => {
+                    filters.forEach((f) => f.classList.remove("active"));
+                    filter.classList.add("active");
+                    const tag = filter.dataset.filter;
+                    cards.forEach((card) => {
+                        if (
+                            tag === "all" ||
+                            card.dataset.tags.split(" ").includes(tag)
+                        ) {
+                            card.classList.remove("hidden");
+                        } else {
+                            card.classList.add("hidden");
+                        }
+                    });
+                });
+            });
+        </script>
+    </body>
 </html>
