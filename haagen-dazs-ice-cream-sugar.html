@@ -339,7 +339,7 @@
     </section>
 
     <section class="source-note">
-      <strong>Bottom line:</strong> Butter Pecan Ice Cream is the least-sugar option found here, at 21 g total sugars per serving. No sugar substitutes were detected in the parsed ingredient lists. Data was collected from official Häagen-Dazs and SmartLabel pages on June 13, 2026; package labels remain the source of truth.
+      <strong>Bottom line:</strong> The lowest value found here is 21 g total sugars per serving. Butter Pecan Ice Cream and Chocolate Peanut Butter Ice Cream both land at that value, though Chocolate Peanut Butter uses the product page's embedded 1 Container SmartLabel serving. No sugar substitutes were detected in the parsed ingredient lists. Data was collected from official Häagen-Dazs and SmartLabel pages on June 13, 2026; package labels remain the source of truth.
     </section>
 
     <section>
@@ -479,13 +479,17 @@
     }
 
     function renderSummary() {
-      const lowest = data.summary.lowest;
-      document.getElementById("lowest-flavor").textContent = lowest.flavor;
-      document.getElementById("lowest-sugar").textContent = `${lowest.sugar} g`;
-      document.getElementById("lowest-serving").textContent = cleanServing(lowest.serving);
+      const minimumSugar = Math.min(...data.flavors.map((flavor) => flavor.sugar));
+      const lowest = data.flavors
+        .filter((flavor) => flavor.sugar === minimumSugar)
+        .sort((a, b) => a.flavor.localeCompare(b.flavor));
+      const heroFlavor = lowest[0];
+      document.getElementById("lowest-flavor").textContent = lowest.map((flavor) => flavor.flavor).join(" + ");
+      document.getElementById("lowest-sugar").textContent = `${minimumSugar} g`;
+      document.getElementById("lowest-serving").textContent = lowest.map((flavor) => cleanServing(flavor.serving)).join(" / ");
       document.getElementById("included-count").textContent = `${data.summary.includedIceCreamCount} ice creams`;
-      document.getElementById("hero-image").src = lowest.image;
-      document.getElementById("hero-image").alt = `${lowest.flavor} package`;
+      document.getElementById("hero-image").src = heroFlavor.image;
+      document.getElementById("hero-image").alt = `${heroFlavor.flavor} package`;
       document.getElementById("hero-caption").textContent = "Lowest sugar per serving in this dataset";
     }
 
