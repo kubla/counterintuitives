@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Häagen-Dazs Ice Cream Sugar Ranking</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root {
+      --ink: #1d2430;
+      --muted: #52606f;
+      --line: #d7dee8;
+      --soft: #f5f7fa;
+      --cream: #fffaf0;
+      --accent: #7a2f23;
+      --accent-2: #1f6f66;
+      --gold: #c99a35;
+    }
+
+    body {
+      background: #f2f5f8;
+      color: var(--ink);
+    }
+
+    .wide-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .page-top {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.6fr);
+      gap: 24px;
+      align-items: center;
+      background: linear-gradient(120deg, #fffaf0 0%, #ffffff 58%, #f4f8f7 100%);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: clamp(20px, 4vw, 36px);
+      margin-bottom: 18px;
+    }
+
+    .page-top h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 4.2rem);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    .page-top p {
+      max-width: 760px;
+      font-size: 1.05rem;
+      line-height: 1.55;
+    }
+
+    .hero-product {
+      margin: 0;
+      justify-self: center;
+      text-align: center;
+    }
+
+    .hero-product img {
+      width: min(240px, 52vw);
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 18px 20px rgba(29, 36, 48, 0.18));
+    }
+
+    .hero-product figcaption {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .finding {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .metric-box {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .metric-box span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .metric-box strong {
+      display: block;
+      margin-top: 6px;
+      font-size: clamp(1.15rem, 2.3vw, 1.7rem);
+      line-height: 1.15;
+    }
+
+    .source-note {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--gold);
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .top-list {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .flavor-tile {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      min-height: 98px;
+    }
+
+    .flavor-tile img {
+      width: 76px;
+      height: 76px;
+      object-fit: contain;
+    }
+
+    .flavor-tile h3 {
+      margin: 0 0 6px;
+      font-size: 0.98rem;
+      line-height: 1.15;
+    }
+
+    .sugar-pill {
+      display: inline-block;
+      background: #f7ead8;
+      border: 1px solid #e6cda8;
+      border-radius: 999px;
+      padding: 4px 8px;
+      color: #663a10;
+      font-weight: 700;
+      font-size: 0.86rem;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) auto auto;
+      gap: 10px;
+      align-items: end;
+      margin: 18px 0 12px;
+    }
+
+    .controls input,
+    .controls select {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .controls button {
+      min-height: 42px;
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .controls button.active {
+      background: var(--accent-2);
+      border-color: var(--accent-2);
+      color: #fff;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1080px;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #e9eef4;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #f8fafc;
+      color: #293241;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      z-index: 1;
+    }
+
+    tbody tr:first-child {
+      background: var(--cream);
+    }
+
+    .flavor-cell {
+      display: grid;
+      grid-template-columns: 54px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      min-width: 250px;
+    }
+
+    .flavor-cell img {
+      width: 54px;
+      height: 54px;
+      object-fit: contain;
+    }
+
+    .flavor-cell strong {
+      display: block;
+      line-height: 1.2;
+    }
+
+    .flavor-cell a {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 0.85rem;
+    }
+
+    .number {
+      font-weight: 800;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .nowrap {
+      white-space: nowrap;
+    }
+
+    details {
+      max-width: 360px;
+    }
+
+    summary {
+      cursor: pointer;
+      color: #1d4ed8;
+      font-weight: 700;
+    }
+
+    .ingredient-list {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: #253244;
+      line-height: 1.4;
+    }
+
+    .note-text {
+      margin-top: 8px;
+      color: #7a2f23;
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+
+    .empty-state {
+      padding: 20px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      .page-top,
+      .finding,
+      .top-list,
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .controls button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wide-container">
+    <p><a href="index.html">Back to index</a></p>
+
+    <header class="page-top">
+      <div>
+        <h1>Häagen-Dazs ice cream, ranked by sugar</h1>
+        <p>
+          A serving-by-serving look at the current U.S. Häagen-Dazs ice cream lineup, using official product pages and SmartLabel records. Sorbets are excluded, and the ingredient lists were checked for common sugar substitutes because the goal is less sweetness, not artificial sweetness.
+        </p>
+      </div>
+      <figure class="hero-product">
+        <img id="hero-image" src="" alt="" />
+        <figcaption id="hero-caption"></figcaption>
+      </figure>
+    </header>
+
+    <section class="finding" aria-label="Summary metrics">
+      <div class="metric-box">
+        <span>Lowest sugar</span>
+        <strong id="lowest-flavor">Loading</strong>
+      </div>
+      <div class="metric-box">
+        <span>Total sugars</span>
+        <strong id="lowest-sugar">Loading</strong>
+      </div>
+      <div class="metric-box">
+        <span>Serving</span>
+        <strong id="lowest-serving">Loading</strong>
+      </div>
+      <div class="metric-box">
+        <span>Included flavors</span>
+        <strong id="included-count">Loading</strong>
+      </div>
+    </section>
+
+    <section class="source-note">
+      <strong>Bottom line:</strong> Butter Pecan Ice Cream is the least-sugar option found here, at 21 g total sugars per serving. No sugar substitutes were detected in the parsed ingredient lists. Data was collected from official Häagen-Dazs and SmartLabel pages on June 13, 2026; package labels remain the source of truth.
+    </section>
+
+    <section>
+      <h2>Lowest sugar flavors</h2>
+      <div id="top-list" class="top-list"></div>
+    </section>
+
+    <section>
+      <h2>Every included ice cream flavor</h2>
+      <p class="meta">
+        The official ice cream category returned 39 tagged products. This page includes the 37 products labeled as ice cream and excludes Mango Sorbet and Raspberry Sorbet. A few SmartLabel serving-size strings had obvious character artifacts; those are cleaned for display while source notes are kept where a product required manual normalization.
+      </p>
+
+      <div class="controls" aria-label="Table controls">
+        <label>
+          Search flavor or ingredient
+          <input id="search" type="search" placeholder="coffee, pecan, chocolate, rum..." />
+        </label>
+        <button id="sort-sugar" type="button" class="active">Lowest sugar</button>
+        <button id="sort-alpha" type="button">A-Z</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Flavor</th>
+              <th>Sugar</th>
+              <th>Serving</th>
+              <th>Calories</th>
+              <th>Total fat</th>
+              <th>Sat fat</th>
+              <th>Carbs</th>
+              <th>Added sugar</th>
+              <th>Protein</th>
+              <th>Ingredients</th>
+              <th>Source</th>
+            </tr>
+          </thead>
+          <tbody id="flavor-body"></tbody>
+        </table>
+        <div id="empty-state" class="empty-state" hidden>No matching flavors.</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="haagen-dazs-data.js"></script>
+  <script>
+    const data = window.HAAGEN_DAZS_ICE_CREAM_DATA;
+    let sortMode = "sugar";
+    let query = "";
+
+    const sugarButton = document.getElementById("sort-sugar");
+    const alphaButton = document.getElementById("sort-alpha");
+    const searchInput = document.getElementById("search");
+    const body = document.getElementById("flavor-body");
+    const emptyState = document.getElementById("empty-state");
+
+    function cleanServing(serving) {
+      return serving
+        .replace("!126g", "126g")
+        .replace("!29g", "129g")
+        .replace("cuup", "cup");
+    }
+
+    function text(value) {
+      return value === "" || value == null ? "Not listed" : String(value);
+    }
+
+    function matches(flavor) {
+      if (!query) return true;
+      const haystack = [
+        flavor.flavor,
+        flavor.serving,
+        flavor.ingredients.join(" "),
+        flavor.note
+      ].join(" ").toLowerCase();
+      return haystack.includes(query);
+    }
+
+    function sortedFlavors() {
+      const rows = data.flavors.filter(matches);
+      if (sortMode === "alpha") {
+        return rows.sort((a, b) => a.flavor.localeCompare(b.flavor));
+      }
+      return rows.sort((a, b) => (a.sugar - b.sugar) || a.flavor.localeCompare(b.flavor));
+    }
+
+    function ingredientDetails(flavor) {
+      const count = flavor.ingredients.length;
+      const items = flavor.ingredients.map((ingredient) => `<li>${ingredient}</li>`).join("");
+      const note = flavor.note ? `<div class="note-text">${flavor.note}</div>` : "";
+      return `<details><summary>${count} ingredients</summary><ol class="ingredient-list">${items}</ol>${note}</details>`;
+    }
+
+    function renderRows() {
+      const rows = sortedFlavors();
+      body.innerHTML = rows.map((flavor) => `
+        <tr>
+          <td>
+            <div class="flavor-cell">
+              <img src="${flavor.image}" alt="" loading="lazy" />
+              <div>
+                <strong>${flavor.flavor}</strong>
+                <a href="${flavor.productUrl}">Product page</a>
+              </div>
+            </div>
+          </td>
+          <td class="number">${flavor.sugar} g</td>
+          <td class="nowrap">${cleanServing(flavor.serving)}</td>
+          <td>${flavor.calories}</td>
+          <td>${text(flavor.totalFat)}</td>
+          <td>${text(flavor.satFat)}</td>
+          <td>${text(flavor.carbs)}</td>
+          <td>${text(flavor.addedSugar)}</td>
+          <td>${text(flavor.protein)}</td>
+          <td>${ingredientDetails(flavor)}</td>
+          <td><a href="${flavor.smartLabelUrl}">SmartLabel</a></td>
+        </tr>
+      `).join("");
+      emptyState.hidden = rows.length !== 0;
+    }
+
+    function renderTopList() {
+      const top = [...data.flavors]
+        .sort((a, b) => (a.sugar - b.sugar) || a.flavor.localeCompare(b.flavor))
+        .slice(0, 8);
+      document.getElementById("top-list").innerHTML = top.map((flavor) => `
+        <article class="flavor-tile">
+          <img src="${flavor.image}" alt="" loading="lazy" />
+          <div>
+            <h3>${flavor.flavor}</h3>
+            <span class="sugar-pill">${flavor.sugar} g sugars</span>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderSummary() {
+      const lowest = data.summary.lowest;
+      document.getElementById("lowest-flavor").textContent = lowest.flavor;
+      document.getElementById("lowest-sugar").textContent = `${lowest.sugar} g`;
+      document.getElementById("lowest-serving").textContent = cleanServing(lowest.serving);
+      document.getElementById("included-count").textContent = `${data.summary.includedIceCreamCount} ice creams`;
+      document.getElementById("hero-image").src = lowest.image;
+      document.getElementById("hero-image").alt = `${lowest.flavor} package`;
+      document.getElementById("hero-caption").textContent = "Lowest sugar per serving in this dataset";
+    }
+
+    function setSortMode(mode) {
+      sortMode = mode;
+      sugarButton.classList.toggle("active", mode === "sugar");
+      alphaButton.classList.toggle("active", mode === "alpha");
+      renderRows();
+    }
+
+    searchInput.addEventListener("input", (event) => {
+      query = event.target.value.trim().toLowerCase();
+      renderRows();
+    });
+    sugarButton.addEventListener("click", () => setSortMode("sugar"));
+    alphaButton.addEventListener("click", () => setSortMode("alpha"));
+
+    renderSummary();
+    renderTopList();
+    renderRows();
+  </script>
+</body>
+</html>
