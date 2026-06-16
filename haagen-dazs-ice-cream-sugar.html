@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Häagen-Dazs Ice Cream Sugar Ranking</title>
+  <title>Häagen-Dazs Ice Cream and Sorbet Sugar Ranking</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
     :root {
@@ -308,9 +308,9 @@
 
     <header class="page-top">
       <div>
-        <h1>Häagen-Dazs ice cream, ranked by sugar</h1>
+        <h1>Häagen-Dazs ice creams and sorbets, ranked by sugar</h1>
         <p>
-          A serving-by-serving look at the current U.S. Häagen-Dazs ice cream lineup, using official product pages and SmartLabel records. Sorbets are excluded, and the ingredient lists were checked for common sugar substitutes because the goal is less sweetness, not artificial sweetness.
+          A serving-by-serving look at the current U.S. Häagen-Dazs ice cream and sorbet lineup, using official product pages and SmartLabel records. The ingredient lists were checked for common sugar substitutes because the goal is less sweetness, not artificial sweetness.
         </p>
       </div>
       <figure class="hero-product">
@@ -333,13 +333,13 @@
         <strong id="lowest-serving">Loading</strong>
       </div>
       <div class="metric-box">
-        <span>Included flavors</span>
+        <span>Included products</span>
         <strong id="included-count">Loading</strong>
       </div>
     </section>
 
     <section class="source-note">
-      <strong>Bottom line:</strong> Butter Pecan Ice Cream is the lowest comparable-serving value found here, at 21 g total sugars per 2/3 cup serving. Chocolate Peanut Butter's product page embeds a smaller 3.6 oz cup SmartLabel showing 21 g per container, but its 14 oz SmartLabel shows 31 g per 2/3 cup, which is the value used for ranking. No sugar substitutes were detected in the parsed ingredient lists. Data was collected from official Häagen-Dazs and SmartLabel pages on June 13, 2026; package labels remain the source of truth.
+      <strong>Bottom line:</strong> Butter Pecan Ice Cream is the lowest comparable-serving value found here, at 21 g total sugars per 2/3 cup serving. The sorbets are sweeter on this basis: Raspberry Sorbet is 36 g per 2/3 cup and Mango Sorbet is 39 g per 2/3 cup. Chocolate Peanut Butter's product page embeds a smaller 3.6 oz cup SmartLabel showing 21 g per container, but its 14 oz SmartLabel shows 31 g per 2/3 cup, which is the value used for ranking. No sugar substitutes were detected in the parsed ingredient lists. Ice cream data was collected from official Häagen-Dazs and SmartLabel pages on June 13, 2026; sorbet records were added from their 14 oz SmartLabel records on June 15, 2026. Package labels remain the source of truth.
     </section>
 
     <section>
@@ -348,9 +348,9 @@
     </section>
 
     <section>
-      <h2>Every included ice cream flavor</h2>
+      <h2>Every included ice cream and sorbet flavor</h2>
       <p class="meta">
-        The official ice cream category returned 39 tagged products. This page includes the 37 products labeled as ice cream and excludes Mango Sorbet and Raspberry Sorbet. A few SmartLabel serving-size strings had obvious character artifacts; those are cleaned for display while source notes are kept where a product required manual normalization.
+        The official ice cream category returned 39 tagged products. This page includes all 39 tagged products: 37 ice creams and 2 sorbets. A few SmartLabel serving-size strings had obvious character artifacts; those are cleaned for display while source notes are kept where a product required manual normalization.
       </p>
 
       <div class="controls" aria-label="Table controls">
@@ -487,7 +487,7 @@
       document.getElementById("lowest-flavor").textContent = lowest.map((flavor) => flavor.flavor).join(" + ");
       document.getElementById("lowest-sugar").textContent = `${minimumSugar} g`;
       document.getElementById("lowest-serving").textContent = lowest.map((flavor) => cleanServing(flavor.serving)).join(" / ");
-      document.getElementById("included-count").textContent = `${data.summary.includedIceCreamCount} ice creams`;
+      document.getElementById("included-count").textContent = `${data.summary.includedProductCount || data.summary.includedIceCreamCount} products`;
       document.getElementById("hero-image").src = heroFlavor.image;
       document.getElementById("hero-image").alt = `${heroFlavor.flavor} package`;
       document.getElementById("hero-caption").textContent = "Lowest sugar per serving in this dataset";
