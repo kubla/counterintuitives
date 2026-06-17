@@ -220,6 +220,38 @@
       z-index: 1;
     }
 
+    .sort-button {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-transform: inherit;
+      letter-spacing: inherit;
+      cursor: pointer;
+    }
+
+    .sort-button[aria-pressed="true"] {
+      color: var(--accent-2);
+    }
+
+    .sort-button:hover,
+    .sort-button:focus-visible {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .sort-indicator {
+      display: inline-block;
+      min-width: 1.2em;
+      font-size: 0.76rem;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
     tbody tr:first-child {
       background: var(--cream);
     }
@@ -274,6 +306,14 @@
       padding-left: 18px;
       color: #253244;
       line-height: 1.4;
+    }
+
+    .ingredient-name {
+      font-weight: 600;
+    }
+
+    .sub-ingredients {
+      color: var(--muted);
     }
 
     .note-text {
@@ -350,7 +390,7 @@
     <section>
       <h2>Every included ice cream and sorbet flavor</h2>
       <p class="meta">
-        The official ice cream category returned 39 tagged products. This page includes all 39 tagged products: 37 ice creams and 2 sorbets. A few SmartLabel serving-size strings had obvious character artifacts; those are cleaned for display while source notes are kept where a product required manual normalization.
+        The official ice cream category returned 39 tagged products. This page includes all 39 tagged products: 37 ice creams and 2 sorbets. Ingredient grouping follows the nested rows in SmartLabel; counts are unique expanded ingredients, so sub-ingredients are not double-counted.
       </p>
 
       <div class="controls" aria-label="Table controls">
@@ -366,16 +406,16 @@
         <table>
           <thead>
             <tr>
-              <th>Flavor</th>
-              <th>Sugar</th>
+              <th aria-sort="none"><button type="button" class="sort-button" data-sort-key="flavor">Flavor <span class="sort-indicator" aria-hidden="true"></span></button></th>
+              <th aria-sort="ascending"><button type="button" class="sort-button" data-sort-key="sugar" aria-pressed="true">Sugar <span class="sort-indicator" aria-hidden="true">asc</span></button></th>
               <th>Serving</th>
-              <th>Calories</th>
-              <th>Total fat</th>
-              <th>Sat fat</th>
-              <th>Carbs</th>
-              <th>Added sugar</th>
-              <th>Protein</th>
-              <th>Ingredients</th>
+              <th aria-sort="none"><button type="button" class="sort-button" data-sort-key="calories">Calories <span class="sort-indicator" aria-hidden="true"></span></button></th>
+              <th aria-sort="none"><button type="button" class="sort-button" data-sort-key="totalFat">Total fat <span class="sort-indicator" aria-hidden="true"></span></button></th>
+              <th aria-sort="none"><button type="button" class="sort-button" data-sort-key="satFat">Sat fat <span class="sort-indicator" aria-hidden="true"></span></button></th>
+              <th aria-sort="none"><button type="button" class="sort-button" data-sort-key="carbs">Carbs <span class="sort-indicator" aria-hidden="true"></span></button></th>
+              <th aria-sort="none"><button type="button" class="sort-button" data-sort-key="addedSugar">Added sugar <span class="sort-indicator" aria-hidden="true"></span></button></th>
+              <th aria-sort="none"><button type="button" class="sort-button" data-sort-key="protein">Protein <span class="sort-indicator" aria-hidden="true"></span></button></th>
+              <th aria-sort="none"><button type="button" class="sort-button" data-sort-key="ingredients">Ingredients <span class="sort-indicator" aria-hidden="true"></span></button></th>
               <th>Source</th>
             </tr>
           </thead>
@@ -389,11 +429,12 @@
   <script src="haagen-dazs-data.js"></script>
   <script>
     const data = window.HAAGEN_DAZS_ICE_CREAM_DATA;
-    let sortMode = "sugar";
+    let sortState = { key: "sugar", direction: "asc" };
     let query = "";
 
     const sugarButton = document.getElementById("sort-sugar");
     const alphaButton = document.getElementById("sort-alpha");
+    const sortButtons = [...document.querySelectorAll("[data-sort-key]")];
     const searchInput = document.getElementById("search");
     const body = document.getElementById("flavor-body");
     const emptyState = document.getElementById("empty-state");
@@ -409,12 +450,89 @@
       return value === "" || value == null ? "Not listed" : String(value);
     }
 
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function cleanIngredientName(name) {
+      return String(name).replace(/:\s*$/, "").trim();
+    }
+
+    function inlineSubingredients(name) {
+      const match = cleanIngredientName(name).match(/^(.+?)\s*\(([^()]+)\)$/);
+      if (!match) return null;
+      return {
+        name: match[1].trim(),
+        subingredients: match[2].split(",").map((item) => ({ name: item.trim(), subingredients: [] }))
+      };
+    }
+
+    function groupsFor(flavor) {
+      return flavor.ingredientGroups || flavor.ingredients.map((name) => ({ name, subingredients: [] }));
+    }
+
+    function searchableIngredients(groups) {
+      return groups.flatMap((group) => [
+        group.name,
+        ...searchableIngredients(group.subingredients || [])
+      ]);
+    }
+
+    function countNames(group) {
+      const inline = inlineSubingredients(group.name);
+      const subingredients = group.subingredients && group.subingredients.length
+        ? group.subingredients
+        : inline?.subingredients;
+      if (subingredients && subingredients.length) {
+        return subingredients.flatMap(countNames);
+      }
+      return [cleanIngredientName(group.name)];
+    }
+
+    function ingredientCount(groups) {
+      const names = groups
+        .flatMap(countNames)
+        .map((name) => name.replace(/[¹²³]/g, "").toLowerCase());
+      return new Set(names).size;
+    }
+
+    function numericValue(value) {
+      if (value === "" || value == null) return null;
+      const match = String(value).match(/-?\d+(\.\d+)?/);
+      return match ? Number(match[0]) : null;
+    }
+
+    function sortValue(flavor, key) {
+      if (key === "flavor") return flavor.flavor;
+      if (key === "ingredients") return ingredientCount(groupsFor(flavor));
+      return numericValue(flavor[key]);
+    }
+
+    function renderIngredientLabel(group) {
+      const inline = inlineSubingredients(group.name);
+      const name = inline ? inline.name : cleanIngredientName(group.name);
+      const subingredients = group.subingredients && group.subingredients.length
+        ? group.subingredients
+        : inline?.subingredients;
+      const subText = subingredients && subingredients.length
+        ? ` <span class="sub-ingredients">(${subingredients.map((item) => escapeHtml(cleanIngredientName(item.name))).join(", ")})</span>`
+        : "";
+      return `<span class="ingredient-name">${escapeHtml(name)}</span>${subText}`;
+    }
+
     function matches(flavor) {
       if (!query) return true;
+      const groups = groupsFor(flavor);
       const haystack = [
         flavor.flavor,
         flavor.serving,
         flavor.ingredients.join(" "),
+        searchableIngredients(groups).join(" "),
         flavor.note
       ].join(" ").toLowerCase();
       return haystack.includes(query);
@@ -422,17 +540,27 @@
 
     function sortedFlavors() {
       const rows = data.flavors.filter(matches);
-      if (sortMode === "alpha") {
-        return rows.sort((a, b) => a.flavor.localeCompare(b.flavor));
-      }
-      return rows.sort((a, b) => (a.sugar - b.sugar) || a.flavor.localeCompare(b.flavor));
+      const direction = sortState.direction === "desc" ? -1 : 1;
+      return rows.sort((a, b) => {
+        const valueA = sortValue(a, sortState.key);
+        const valueB = sortValue(b, sortState.key);
+        if (typeof valueA === "string" || typeof valueB === "string") {
+          return String(valueA).localeCompare(String(valueB)) * direction;
+        }
+        if (valueA == null && valueB == null) return a.flavor.localeCompare(b.flavor);
+        if (valueA == null) return 1;
+        if (valueB == null) return -1;
+        return ((valueA - valueB) * direction) || a.flavor.localeCompare(b.flavor);
+      });
     }
 
     function ingredientDetails(flavor) {
-      const count = flavor.ingredients.length;
-      const items = flavor.ingredients.map((ingredient) => `<li>${ingredient}</li>`).join("");
+      const groups = groupsFor(flavor);
+      const count = ingredientCount(groups);
+      const label = `${count} unique ingredient${count === 1 ? "" : "s"}`;
+      const items = groups.map((group) => `<li>${renderIngredientLabel(group)}</li>`).join("");
       const note = flavor.note ? `<div class="note-text">${flavor.note}</div>` : "";
-      return `<details><summary>${count} ingredients</summary><ol class="ingredient-list">${items}</ol>${note}</details>`;
+      return `<details><summary>${label}</summary><ol class="ingredient-list">${items}</ol>${note}</details>`;
     }
 
     function renderRows() {
@@ -494,10 +622,35 @@
     }
 
     function setSortMode(mode) {
-      sortMode = mode;
-      sugarButton.classList.toggle("active", mode === "sugar");
-      alphaButton.classList.toggle("active", mode === "alpha");
+      sortState = {
+        key: mode === "alpha" ? "flavor" : "sugar",
+        direction: "asc"
+      };
+      renderSortState();
       renderRows();
+    }
+
+    function setSortKey(key) {
+      sortState = {
+        key,
+        direction: sortState.key === key && sortState.direction === "asc" ? "desc" : "asc"
+      };
+      renderSortState();
+      renderRows();
+    }
+
+    function renderSortState() {
+      const activeMode = sortState.key === "flavor" ? "alpha" : sortState.key;
+      sugarButton.classList.toggle("active", activeMode === "sugar" && sortState.direction === "asc");
+      alphaButton.classList.toggle("active", activeMode === "alpha" && sortState.direction === "asc");
+      sortButtons.forEach((button) => {
+        const active = button.dataset.sortKey === sortState.key;
+        const th = button.closest("th");
+        const indicator = button.querySelector(".sort-indicator");
+        button.setAttribute("aria-pressed", String(active));
+        th.setAttribute("aria-sort", active ? (sortState.direction === "asc" ? "ascending" : "descending") : "none");
+        indicator.textContent = active ? sortState.direction : "";
+      });
     }
 
     searchInput.addEventListener("input", (event) => {
@@ -506,9 +659,13 @@
     });
     sugarButton.addEventListener("click", () => setSortMode("sugar"));
     alphaButton.addEventListener("click", () => setSortMode("alpha"));
+    sortButtons.forEach((button) => {
+      button.addEventListener("click", () => setSortKey(button.dataset.sortKey));
+    });
 
     renderSummary();
     renderTopList();
+    renderSortState();
     renderRows();
   </script>
 </body>
